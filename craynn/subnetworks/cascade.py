@@ -7,7 +7,7 @@ from .. import layers as clayers
 from .common import get_kernels_by_type
 
 __all__ = [
-  'cascade',
+  'cascade_op',
   'cascade_chain',
   'cascade_block',
   'decremental_cascade_block',
@@ -35,7 +35,7 @@ def cascade_merge_const(incomings, target_shape, merge=clayers.min, scale=clayer
   b = scale(b, target_shape)
   return merge([a, b])
 
-def cascade(
+def cascade_op(
   incoming, mid_interests=None, interests=None,
   layer=lambda i: clayers.conv(i, num_filters=4),
   interest=clayers.interest,
