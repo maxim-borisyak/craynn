@@ -13,6 +13,7 @@ __all__ = [
   'decremental_cascade_block',
   'cascade_merge',
   'cascade_merge_rev',
+  'cascade_merge_const',
   'get_interest_kernels'
 ]
 
@@ -26,6 +27,12 @@ def cascade_merge(incomings, merge=clayers.min, scale=clayers.scale_to):
 def cascade_merge_rev(incomings, merge=clayers.min, scale=clayers.scale_to):
   a, b = incomings
   a = scale(a, b)
+  return merge([a, b])
+
+def cascade_merge_const(incomings, target_shape, merge=clayers.min, scale=clayers.scale_to):
+  a, b = incomings
+  a = scale(a, target_shape)
+  b = scale(b, target_shape)
   return merge([a, b])
 
 def cascade(

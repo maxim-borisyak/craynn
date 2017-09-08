@@ -36,17 +36,3 @@ def scale_to(net, target, pool=max_pool, upscale=upscale):
 
 
 floating_scale_to = lambda net, target: scale_to(net, target, pool=floating_maxpool, upscale=upscale)
-
-def scale_concat(incomings, scale_to=scale_to):
-  net, target = incomings
-  return concat([
-    scale_to(net, target),
-    target
-  ])
-
-def scale_concat_rev(incomings, scale_to=scale_to):
-  target, net = incomings
-  return concat([
-    scale_to(net, target),
-    target
-  ])

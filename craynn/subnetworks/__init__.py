@@ -5,3 +5,4 @@ from diffnet import *
 from cascade import *
 from common import *
 from fire import *
+from scale import *

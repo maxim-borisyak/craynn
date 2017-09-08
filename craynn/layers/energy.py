@@ -39,7 +39,7 @@ def energy_pool(layer, n_channels = 1, exclude_borders=None, norm=True, dtype='f
 
   return net
 
-from ..objective import plain_mse
+from ..objectives import plain_mse
 
 class Energy2DLayer(layers.MergeLayer):
   def __init__(self, incomings, energy_function = plain_mse, *args, **kwargs):
