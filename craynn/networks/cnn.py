@@ -1,5 +1,5 @@
-from crayimage.nn import Expression
-from crayimage.nn.layers import *
+from .. import Expression
+from ..layers import *
 
 from common import *
 from craynn.subnetworks import cnn, cae

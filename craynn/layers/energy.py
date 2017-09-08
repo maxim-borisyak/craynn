@@ -2,7 +2,7 @@ import numpy as np
 import theano.tensor as T
 from lasagne import *
 
-from craynn import Redistribution2DLayer
+from . import Redistribution2DLayer
 
 __all__ = [
   'energy_pooling',

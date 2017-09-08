@@ -1,6 +1,5 @@
-from craynn import Expression
-from craynn import plain_mse
-
+from .. import Expression
+from ..objectives import plain_mse
 from ..layers import Energy2DLayer
 
 __all__ = [

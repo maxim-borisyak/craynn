@@ -5,8 +5,6 @@ from .conv import max_pool, upscale, floating_maxpool, concat
 __all__ = [
   'scale_to',
   'floating_scale_to',
-  'scale_concat',
-  'scale_concat_rev'
 ]
 
 def scale_to(net, target, pool=max_pool, upscale=upscale):

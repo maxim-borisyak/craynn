@@ -10,8 +10,6 @@ import itertools
 import threading
 from Queue import Queue
 
-from crayimage.imgutils import slice
-
 __all__ = [
   'random',
   'random_seq',
@@ -21,7 +19,6 @@ __all__ = [
   'np_from_disk',
   'sampling',
   'binned',
-  'traverse'
 ]
 
 def random(n_samples, batch_size=128, n_batches=None, replace=True, priors=None):
@@ -67,12 +64,6 @@ def traverse(f, X, batch_size=1024):
     f(X[indx])
     for indx in seq(X.shape[0], batch_size=batch_size)
   ])
-
-def traverse_image(f, img, window = 40, step = 20, batch_size=32):
-  patches = slice(img, window = window, step = step)
-  patches_shape = patches.shape[:2]
-
-  return traverse(f, patches, batch_size=batch_size).reshape(patches_shape + (-1, ))
 
 def binned(target_statistics, batch_size, n_batches, n_bins=64):
   hist, bins = np.histogram(target_statistics, bins=n_bins)

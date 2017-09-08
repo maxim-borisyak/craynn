@@ -1,4 +1,4 @@
-from crayimage.nn import Expression
+from .. import Expression
 from lasagne import *
 
 from common import *

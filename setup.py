@@ -1,16 +1,11 @@
 """
-CRAYimage - a toolkit for processing images from a mobile phones' cameras
-  exposed to a radiocative source.
-
-  Developed primarily as a toolkit for data analysis in CRAYFIS experiment.
+CRAYNN - yet another NN toolkit.
 """
 
-from setuptools import setup, find_packages, Extension
+from setuptools import setup, find_packages
 from codecs import open
 import os.path as osp
 import numpy as np
-
-from Cython.Build import cythonize
 
 here = osp.abspath(osp.dirname(__file__))
 

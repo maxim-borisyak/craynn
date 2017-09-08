@@ -1,8 +1,8 @@
 from lasagne import *
 
 from common import *
-from craynn import Expression
-from craynn import conv_companion
+from .. import Expression
+from ..layers import conv_companion
 
 __all__ = [
   'DSN', 'dsn', 'default_dsn'
