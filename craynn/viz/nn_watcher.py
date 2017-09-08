@@ -4,19 +4,21 @@ import os.path as osp
 
 __all__ = [
   'NNWatcher',
-  'NNWatcher2'
+  'SNNWatcher'
 ]
+
+from IPython import display
 
 class NNWatcher(object):
   limit = 2 ** 15
 
   def __init__(self, title, labels=('loss', ), colors=('blue', ), mode='full',
-               fig_size=(12, 6), save_dir='./'):
+               figsize=(9, 6), save_dir='./', plot_mode='inline'):
     self.save_dir = save_dir
-
+    self.plot_mode = plot_mode
     self.mode = mode
 
-    self.fig = plt.figure(figsize=fig_size)
+    self.fig = plt.figure(figsize=figsize)
     self.ax = self.fig.add_subplot(111)
 
     self.ax.set_xlim([0.0, 1.0])
@@ -67,6 +69,9 @@ class NNWatcher(object):
 
       return d[-lim:]
 
+    if self.plot_mode == 'inline':
+      display.clear_output(wait=True)
+
     data = [ crop(d) for d in data ]
 
     x_lim = np.max([d.shape[0] for d in data])
@@ -86,45 +91,34 @@ class NNWatcher(object):
         line.set_xdata(xs)
         line.set_ydata(d)
 
-    self.fig.canvas.draw()
+    if self.plot_mode == 'inline':
+      display.display(self.fig)
+    else:
+      self.fig.canvas.draw()
+
     self.fig.savefig(osp.join(self.save_dir, '%s.png' % self.title), dpi=420)
 
-from IPython import display
-
-class NNWatcher2(object):
+class SNNWatcher(object):
   limit = 2 ** 15
 
   def __init__(self, title, labels=('loss', ), colors=('blue', ), mode='full',
-               fig_size=(12, 6), save_dir='./'):
+               figsize=(9, 6), save_dir='./', plot_mode='inline'):
     self.save_dir = save_dir
-
+    self.plot_mode = plot_mode
     self.mode = mode
 
-    self.fig = plt.figure(figsize=fig_size)
+    self.fig = plt.figure(figsize=figsize)
     self.ax = self.fig.add_subplot(111)
 
     self.ax.set_xlim([0.0, 1.0])
     self.ax.set_ylim([0.0, 1.0])
 
-    self.mean_lines = []
-    self.lines = []
-
     self.fig.suptitle(title)
     self.title = title
 
-    for label, color in zip(labels, colors):
-      self.mean_lines.append(
-        self.ax.plot([], [], label=label, color=color)[0]
-      )
-
-      if mode is 'full':
-        self.lines.append(
-          self.ax.plot([], [], alpha=0.5, color=color)[0]
-        )
-      elif mode is 'mean':
-        self.lines.append(None)
-
-    self.ax.legend()
+    self.colors = colors
+    self.labels = labels
+    self.drawn = False
 
   @classmethod
   def _get_ylim(cls, data):
@@ -151,7 +145,10 @@ class NNWatcher2(object):
 
       return d[-lim:]
 
-    display.clear_output(wait=True)
+    self.ax.clear()
+
+    if self.plot_mode == 'inline':
+      display.clear_output(wait=True)
 
     data = [ crop(d) for d in data ]
 
@@ -161,16 +158,26 @@ class NNWatcher2(object):
     y_lower, y_upper = self._get_ylim(data)
     self.ax.set_ylim([y_lower, y_upper])
 
-    for d, line, mean_line in zip(data, self.lines, self.mean_lines):
+    for d, color, label in zip(data, self.colors, self.labels):
       trend = np.mean(d, axis=1)
 
-      mean_line.set_xdata(np.arange(d.shape[0]) + 0.5)
-      mean_line.set_ydata(trend)
+      iters = np.arange(d.shape[0]) + 0.5
+      self.ax.plot(iters, trend, label=label, color=color)
 
       if self.mode == 'full':
         xs = np.linspace(0, d.shape[0], num=int(np.prod(d.shape)))
-        line.set_xdata(xs)
-        line.set_ydata(d)
+        self.ax.plot(xs, d.ravel(), color=color, alpha=0.5)
+      else:
+        stds = np.std(d, axis=1)
+        self.ax.fill_between(iters, trend - stds, trend + stds, alpha=0.3, color=color)
 
-    display.display(self.fig)
+    if not self.drawn:
+      self.ax.legend()
+      self.drawn = False
+
+    if self.plot_mode == 'inline':
+      display.display(self.fig)
+    else:
+      self.fig.canvas.draw()
+
     self.fig.savefig(osp.join(self.save_dir, '%s.png' % self.title), dpi=420)
