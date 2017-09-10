@@ -169,11 +169,11 @@ class SNNWatcher(object):
         self.ax.plot(xs, d.ravel(), color=color, alpha=0.5)
 
       if self.mode == 'fill':
-        lower1 = np.percentile(d, q=0.2, axis=1)
-        upper1 = np.percentile(d, q=0.8, axis=1)
-        lower2 = np.percentile(d, q=0.1, axis=1)
-        upper2 = np.percentile(d, q=0.9, axis=1)
-        self.ax.fill_between(iters, lower1, upper1, alpha=0.3, color=color)
+        lower1 = np.percentile(d, q=20, axis=1)
+        upper1 = np.percentile(d, q=80, axis=1)
+        lower2 = np.percentile(d, q=10, axis=1)
+        upper2 = np.percentile(d, q=90, axis=1)
+        self.ax.fill_between(iters, lower1, upper1, alpha=0.2, color=color)
         self.ax.fill_between(iters, lower2, upper2, alpha=0.1, color=color)
 
     if not self.drawn:
