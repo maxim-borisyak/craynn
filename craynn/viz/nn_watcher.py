@@ -178,6 +178,9 @@ class SNNWatcher(object):
         self.ax.fill_between(iters, lower1, upper1, alpha=0.2, color=color)
         self.ax.fill_between(iters, lower2, upper2, alpha=0.1, color=color)
 
+      if self.mode == 'avg' or self.mode == 'mean':
+        pass
+
     if not self.drawn:
       self.ax.legend()
       self.drawn = False
