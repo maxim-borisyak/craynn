@@ -140,10 +140,12 @@ class SNNWatcher(object):
 
   def draw(self, *data):
     def crop(d):
-      epoch_size = np.prod(d.shape[1:])
-      lim = self.limit / epoch_size
-
-      return d[-lim:]
+      if self.mode == 'full':
+        epoch_size = np.prod(d.shape[1:])
+        lim = self.limit / epoch_size
+        return d[-lim:]
+      else:
+        return d
 
     self.ax.clear()
 
