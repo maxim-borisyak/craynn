@@ -113,3 +113,15 @@ def border_mask(exclude_borders, img_shape, dtype='float32'):
   mask[:, -n:] = 0
 
   return theano.shared(mask, name='border_excluding_mask')
+
+def masked(exclude_borders, img_shape, dtype='float32'):
+  if exclude_borders > 0:
+    M = border_mask(exclude_borders, img_shape, dtype)
+
+    def m(X):
+      return X * M[None, None, :, :]
+
+    return m
+  else:
+    M = None
+    return lambda X: X
