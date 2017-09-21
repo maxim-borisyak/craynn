@@ -7,7 +7,7 @@ from lasagne import updates
 from lasagne.updates import get_or_compute_grads, total_norm_constraint
 from collections import OrderedDict
 
-def careful_rmsprop(loss_or_grads, params, learning_rate=1.0, rho=0.9, epsilon=1e-6, grad_clipping=1.0e-2):
+def careful_rmsprop(loss_or_grads, params, learning_rate=1.0, rho=0.9, epsilon=1e-6, grad_clipping=1.0):
   """
   RMSProp with gradient clipping.
   :param grad_clipping: maximal norm of gradient, if norm of the actual gradient exceeds this values it is rescaled.

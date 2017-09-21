@@ -124,16 +124,11 @@ class SNNWatcher(object):
   def _get_ylim(cls, data):
     trends = [np.mean(d, axis=1) for d in data]
 
-    min_trend = np.min([np.min(trend) for trend in trends])
-    max_trend = np.max([np.max(trend) for trend in trends])
-    s_trend = 0.05 * (max_trend - min_trend)
+    min_data = np.min([np.percentile(d, q=2) for d in data])
+    max_data = np.max([np.percentile(d, q=98) for d in data])
 
-    s = np.max([np.std(d - trend[:, None]) for d, trend in zip(data, trends)])
-    min_data = np.min([np.percentile(d, q=5) for d in data])
-    max_data = np.max([np.percentile(d, q=95) for d in data])
-
-    lower_bound = np.min([min_data - s, min_trend - s_trend])
-    upper_bound = np.max([max_data + s, max_trend + s_trend])
+    lower_bound = min_data
+    upper_bound = max_data
 
     return lower_bound, upper_bound
 
