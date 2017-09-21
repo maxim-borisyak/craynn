@@ -1,6 +1,12 @@
 import theano
 import theano.tensor as T
 
+__all__ = [
+  'GAN',
+  'CycleGAN',
+  'StageGAN'
+]
+
 class GAN(object):
   def __init__(self, loss, discriminator, generator):
     """
