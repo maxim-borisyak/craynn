@@ -12,7 +12,9 @@ __all__ = [
 ]
 
 def cnn(input_layer, num_filters, conv_op=conv, pool_op = max_pool, last_pool=False):
-  return chain(input_layer, [
+  return chain(
+    incoming=input_layer,
+    layer_ops = [
         (lambda i: conv_op(i, n), pool_op if (last_pool or i < len(num_filters) - 1) else None)
         for i, n in enumerate(num_filters)
     ]

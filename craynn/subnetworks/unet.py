@@ -7,33 +7,20 @@ __all__ = [
   'make_unet',
 ]
 
-def make_unet(input_layer, n_channels, return_groups = False, **conv_kwargs):
-  conv_kwargs = complete_conv_kwargs(conv_kwargs)
-
+def make_unet(input_layer, convs, deconvs, pool, concat, return_groups = False):
   initial_channels = layers.get_output_shape(input_layer)[1]
 
   net = input_layer
   forward = [net]
   backward = []
 
-  for i, n_chl in enumerate(n_channels[:-1]):
-    net = layers.Conv2DLayer(
-      net,
-      num_filters=n_chl,
-      **conv_kwargs
-    )
-
-    net = layers.MaxPool2DLayer(
-      net, pool_size=(2, 2)
-    )
+  for i, conv in enumerate(conv_ops[-1]):
+    net = conv(net)
+    net = pool(net)
 
     forward.append(net)
 
-  net = layers.Conv2DLayer(
-    net,
-    num_filters=n_channels[-1],
-    **conv_kwargs
-  )
+  net = conv_ops[-1](net)
 
   for i, (n_chl, l) in enumerate(zip(n_channels[:-1][::-1], forward[::-1])):
     net = concat_conv(

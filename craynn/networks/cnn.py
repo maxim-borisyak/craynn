@@ -14,7 +14,7 @@ class CNN(Expression):
                img_shape=(1, 128, 128),
                preprocessing=nothing,
                block=conv,
-               pool=mean_pool,
+               pool=floating_meanpool,
                postprocessing = max_conv_companion,
                input_layer = None):
     self.input_layer = get_input_layer(img_shape, input_layer)
