@@ -98,6 +98,12 @@ chain = lambda *definition: lambda incoming: _chain(incoming, definition)
 def _achain(incoming, definition):
   net = incoming
 
+  if not hasattr(definition, '__iter__'):
+    print 'Apllying', definition, 'to', net
+    net = definition(net)
+    print 'Result', net
+    return net
+
   for op in definition:
     print 'Apllying', op, 'to', net
     if hasattr(op, '__iter__'):

@@ -36,12 +36,12 @@ max_companion = lambda n_units=None, f=None: lambda incoming: \
 mean_companion = lambda n_units=None, f=None: lambda incoming: \
   _conv_companion(incoming, n_units=n_units, pool_function=T.mean, nonlinearity=f)
 
-def cnn(num_filters, conv_op=conv, pool_op=max_pool, companion=max_companion):
+def cnn(num_filters, conv_op=conv, pool_op=max_pool, companion=max_companion()):
   block = lambda n_filters: (conv_op(n), pool_op((2, 2)))
 
   blocks = [
     block(n) if (i < len(num_filters) - 1) else conv_op(n)
-    for n, i in enumerate(num_filters)
+    for i, n in enumerate(num_filters)
   ] + [
     companion
   ]
