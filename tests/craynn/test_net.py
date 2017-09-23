@@ -9,18 +9,14 @@ from craynn.viz import draw_to_file
 class TestChains(unittest.TestCase):
   def test_import(self):
 
-    test_input = layers.InputLayer(shape=(None, 1, 128, 128))
+    test_input = layers.InputLayer(shape=(None, 1, 256, 256))
 
     net = chain(
-      (conv(4), max_pool()),
-      (conv(2), max_pool()),
-      (conv(3), max_pool()),
-      (conv(6), max_pool()),
-      conv(12),
-    )(test_input)
-
-    net = cnn(
-      num_filters=(1, 2, 3),
+      (freeze(4), max_pool()),
+      (freeze(16), max_pool()),
+      (freeze(16), max_pool()),
+      (freeze(6), max_pool()),
+      freeze(12),
     )(test_input)
 
     draw_to_file(layers.get_all_layers(net), 'test_net.png')

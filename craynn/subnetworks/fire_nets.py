@@ -32,16 +32,16 @@ fire = lambda n_filters: lambda incoming: \
 def make_freeze_module(
   incoming,
   n_filters = 64,
-  squeeze=clayers.squeeze,
-  expand=(clayers.diff, clayers.diff1x1),
-  merge=clayers.concat
+  squeeze_op=clayers.squeeze,
+  expand_ops=(clayers.diff, clayers.diff1x1),
+  merge=clayers.concat()
 ):
-  expanded = [exp(incoming, n_filters) for exp in expand]
+  expanded = [ exp(n_filters)(incoming) for exp in expand_ops]
   net = merge(expanded)
-  return squeeze(net, n_filters / 4)
+  return squeeze_op(n_filters / 4)(net)
 
-freeze_module = lambda n_filters, squeeze=clayers.squeeze, expand=(clayers.diff, clayers.diff1x1), merge=clayers.concat: lambda incoming: \
-  make_freeze_module(incoming, n_filters, squeeze, expand, merge)
+freeze_module = lambda n_filters, squeeze_op=clayers.squeeze, expand_ops=(clayers.diff, clayers.diff1x1), merge=clayers.concat(): lambda incoming: \
+  make_freeze_module(incoming, n_filters, squeeze_op, expand_ops, merge)
 
 freeze = lambda n_filters: lambda incoming: \
   make_freeze_module(incoming, n_filters)
