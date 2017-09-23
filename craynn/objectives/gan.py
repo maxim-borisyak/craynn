@@ -6,9 +6,16 @@ __all__ = [
   'energy_based'
 ]
 
-def cross_entropy_linear(scores_real, scores_pseudo):
-  log_f = T.nnet.softplus(-scores_real)
-  log_1_f = T.nnet.softplus(scores_pseudo)
+def cross_entropy(scores_real, scores_pseudo, mode='normal'):
+  if mode == 'normal':
+    log_f = -T.log(scores_real)
+    log_1_f = -T.log(1 - scores_pseudo)
+  elif mode == 'linear':
+    log_f = T.nnet.softplus(-scores_real)
+    log_1_f = T.nnet.softplus(scores_pseudo)
+  else:
+    raise ValueError('Mode should be either normal or linear')
+
 
   loss_real = T.mean(log_f)
   loss_pseudo = T.mean(log_1_f)

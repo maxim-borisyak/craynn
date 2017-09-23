@@ -2,7 +2,8 @@ import theano.tensor as T
 from lasagne import *
 
 __all__ = [
-  'conv', 'max_pool', 'upscale', 'mean_pool',
+  'conv', 'deconv', 'conv_seq', 'deconv_seq',
+  'max_pool', 'upscale', 'mean_pool',
   'floating_maxpool', 'floating_meanpool',
   'min', 'max', 'concat',
   'noise', 'nothing',
@@ -13,8 +14,26 @@ __all__ = [
 conv = lambda incoming, num_filters: layers.Conv2DLayer(
   incoming,
   num_filters=num_filters, filter_size=(3, 3),
-  nonlinearity=nonlinearities.LeakyRectify(0.05)
+  nonlinearity=nonlinearities.LeakyRectify(0.05),
+  pad='valid'
 )
+
+conv_seq = lambda initial_filters, size: [
+  lambda inc: conv(inc, initial_filters * (2 ** i))
+  for i in range(size)
+]
+
+deconv = lambda incoming, num_filters: layers.TransposedConv2DLayer(
+  incoming,
+  num_filters=num_filters, filter_size=(3, 3),
+  nonlinearity=nonlinearities.LeakyRectify(0.05),
+  crop='valid'
+)
+
+deconv_seq = lambda initial_filters, size: [
+  lambda inc: deconv(inc, initial_filters * (2 ** i))
+  for i in range(size)
+]
 
 max_pool = lambda incoming, pool_size=(2, 2): layers.MaxPool2DLayer(incoming, pool_size=pool_size)
 floating_maxpool = lambda incoming, pool_size=(2, 2): layers.MaxPool2DLayer(

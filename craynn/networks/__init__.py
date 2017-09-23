@@ -7,3 +7,5 @@ from unet import *
 from diffnet import *
 from cascade import *
 from gans import *
+
+from common import Net, net

@@ -5,7 +5,10 @@ import theano.tensor as T
 
 from lasagne import *
 
+from craynn import Expression
+
 __all__ = [
+  'Net', 'net',
   'factory',
   'get_input_layer',
   'get_noise_layer',
@@ -35,3 +38,16 @@ def get_noise_layer(input_layer, sigma=None):
     return layers.GaussianNoiseLayer(input_layer, sigma=sigma, name='noise')
   else:
     return input_layer
+
+
+class Net(Expression):
+  def __init__(self, factory, img_shape=None, input_layer=None):
+    self.input_layer = get_input_layer(img_shape, input_layer)
+    net = factory(self.input_layer)
+
+    if not hasattr(net, '__iter__'):
+      net = [net]
+
+    super(Net, self).__init__([self.input_layer], net)
+
+net = lambda factory, img_shape=None, input_layer=None: Net(factory, img_shape, input_layer)
