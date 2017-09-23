@@ -151,15 +151,10 @@ class StageGAN(object):
   def __call__(self, X_real, X_pseudo):
     """
     Connects GAN, compiles discriminator step
-    :param X_real: theano expression that holds real values
-    :param Z: input for generator
-    :return:
     """
 
-    self.X_pseudo = X_pseudo
-
     self.scores_real = self.discriminators(X_real)
-    self.scores_pseudo = self.discriminators(self.X_pseudo)
+    self.scores_pseudo = self.discriminators(X_pseudo)
 
     self.losses_discriminator = []
     self.losses_generator = []
