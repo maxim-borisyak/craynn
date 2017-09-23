@@ -2,7 +2,7 @@ from lasagne import *
 
 from common import *
 from .. import Expression
-from ..layers import conv_companion
+from ..subnetworks import companion
 
 __all__ = [
   'DSN', 'dsn', 'default_dsn'

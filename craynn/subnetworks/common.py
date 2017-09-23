@@ -7,7 +7,7 @@ __all__ = [
   'get_deconv_kwargs',
   'adjust_channels',
   'get_kernels_by_type',
-  'chain', 'seq'
+  'chain', 'achain', 'seq'
 ]
 
 def complete_conv_kwargs(conv_kwargs):
@@ -80,15 +80,40 @@ def seq(incoming, layer_ops):
 
   return layers
 
-def chain(incoming, layer_ops):
+def _chain(incoming, definition):
   net = incoming
 
-  for layer in layer_ops:
+  for layer in definition:
     if hasattr(layer, '__iter__'):
-      net = chain(net, layer)
+      net = _chain(net, layer)
     elif layer is None:
       pass
     else:
       net = layer(net)
 
   return net
+
+chain = lambda *definition: lambda incoming: _chain(incoming, definition)
+
+def _achain(incoming, definition):
+  net = incoming
+
+  for op in definition:
+    print 'Apllying', op, 'to', net
+    if hasattr(op, '__iter__'):
+      if type(op) is tuple:
+        net = _achain(net, op)
+        print 'Result', net
+      elif type(op) is list:
+        net = [
+          _achain(net, o)
+          for o in op
+        ]
+        print 'Result', net
+    else:
+      net = op(net)
+      print 'Result', net
+
+  return net
+
+achain = lambda *definition: lambda incoming: _achain(incoming, definition)

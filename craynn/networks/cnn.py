@@ -2,7 +2,8 @@ from .. import Expression
 from ..layers import *
 
 from common import *
-from craynn.subnetworks import cnn, cae
+from ..subnetworks import cnn, cae
+from ..subnetworks import max_companion
 
 __all__ = [
   'CNN',
@@ -15,12 +16,12 @@ class CNN(Expression):
                preprocessing=nothing,
                block=conv,
                pool=floating_meanpool,
-               postprocessing = max_conv_companion,
+               postprocessing = max_companion,
                input_layer = None):
     self.input_layer = get_input_layer(img_shape, input_layer)
 
     net = preprocessing(self.input_layer)
-    net = cnn(net, n_filters, conv_op=block, pool_op=pool, last_pool=False)
+    net = cnn(n_filters, conv_op=block, pool_op=pool, last_pool=False)(net)
     net = postprocessing(net)
 
     super(CNN, self).__init__([self.input_layer], [net])

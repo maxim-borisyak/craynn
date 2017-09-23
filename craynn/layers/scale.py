@@ -1,6 +1,7 @@
 from lasagne import *
 
-from .conv import max_pool, upscale, floating_maxpool, concat
+from conv_ops import max_pool, upscale, floating_maxpool
+from common import concat
 
 __all__ = [
   'scale_to',

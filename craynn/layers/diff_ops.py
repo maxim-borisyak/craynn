@@ -12,6 +12,8 @@ __all__ = [
   'concat_diff'
 ]
 
+from conv_ops import get_conv_nonlinearity
+
 class Diffusion2DLayer(layers.Conv2DLayer):
   def __init__(self, incoming, num_filters, filter_size,
                untie_biases=False,
@@ -29,18 +31,18 @@ class Diffusion2DLayer(layers.Conv2DLayer):
   def diffusion_kernel(self):
     return self.W
 
-diff = lambda incoming, num_filters: Diffusion2DLayer(
+diff = lambda num_filters, f=None: lambda incoming: Diffusion2DLayer(
   incoming=incoming,
   num_filters=num_filters,
   filter_size=(3, 3),
-  nonlinearity=nonlinearities.LeakyRectify(0.05),
+  nonlinearity=get_conv_nonlinearity(f),
 )
 
-diff1x1 = lambda incoming, num_filters: Diffusion2DLayer(
+diff1x1 = lambda num_filters, f=None: lambda incoming: Diffusion2DLayer(
   incoming=incoming,
   num_filters=num_filters,
   filter_size=(1, 1),
-  nonlinearity=nonlinearities.LeakyRectify(0.05),
+  nonlinearity=get_conv_nonlinearity(f),
 )
 
 class Redistribution2DLayer(layers.Conv2DLayer):
@@ -62,7 +64,7 @@ class Redistribution2DLayer(layers.Conv2DLayer):
   def redistribution_kernel(self):
     return self.W
 
-redist = lambda incoming, num_filters: Redistribution2DLayer(
+redist = lambda num_filters: lambda incoming: Redistribution2DLayer(
   incoming=incoming,
   num_filters=num_filters,
   nonlinearity=nonlinearities.linear,

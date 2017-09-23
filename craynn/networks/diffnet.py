@@ -3,8 +3,6 @@ import theano.tensor as T
 
 from .. import Expression
 
-from ..layers import conv_companion
-
 from ..subnetworks import *
 from ..subnetworks.common import adjust_channels
 
@@ -121,7 +119,7 @@ class DiffusionNetClassification(Expression):
       net, cs = make_diff_chain(net, block_size, n_channels, return_convs=True, **conv_kwargs)
       self.convs.extend(cs)
       self.outputs.append(
-        conv_companion(net, pool_function=T.mean, n_units=channels[-1])
+        companion(net, pool_function=T.mean, n_units=channels[-1])
       )
 
     super(DiffusionNetClassification, self).__init__([self.input_layer], self.outputs)

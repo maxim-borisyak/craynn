@@ -1,7 +1,6 @@
 from common import complete_conv_kwargs
 
 from lasagne import *
-from ..layers import concat_conv
 
 __all__ = [
   'make_unet',

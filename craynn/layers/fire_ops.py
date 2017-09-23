@@ -9,6 +9,8 @@ __all__ = [
   'squeeze'
 ]
 
+from conv_ops import get_conv_nonlinearity
+
 class SqueezeLayer(layers.Conv2DLayer):
   def __init__(self, incoming, num_filters,
                untie_biases=False,
@@ -25,4 +27,5 @@ class SqueezeLayer(layers.Conv2DLayer):
                                        nonlinearity, flip_filters, convolution,
                                        **kwargs)
 
-squeeze = lambda i, n: SqueezeLayer(i, num_filters=n)
+squeeze = lambda num_filters, f=None: lambda incoming: \
+  SqueezeLayer(incoming, num_filters=num_filters, nonlinearity=get_conv_nonlinearity(f))
