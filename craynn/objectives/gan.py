@@ -2,10 +2,11 @@ import theano
 import theano.tensor as T
 
 __all__ = [
+  'cross_entropy_linear',
   'energy_based'
 ]
 
-def log_cross_entropy(scores_real, scores_pseudo):
+def cross_entropy_linear(scores_real, scores_pseudo):
   log_f = T.nnet.softplus(-scores_real)
   log_1_f = T.nnet.softplus(scores_pseudo)
 
