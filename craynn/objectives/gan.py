@@ -20,7 +20,7 @@ def cross_entropy(scores_real, scores_pseudo, mode='normal'):
   loss_real = T.mean(log_f)
   loss_pseudo = T.mean(log_1_f)
 
-  return 0.5 * (loss_real + loss_pseudo), -loss_pseudo
+  return 0.5 * (loss_real + loss_pseudo), loss_pseudo
 
 
 def energy_based(X_original, X_generated, discriminator, margin = 1):

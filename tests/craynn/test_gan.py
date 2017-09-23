@@ -18,6 +18,7 @@ class TestChains(unittest.TestCase):
     X = T.ftensor4()
     Z = T.ftensor4()
     generator = Net(conv(32), img_shape=(1, 128, 128))
+    X_ = generator(Z)
 
     linear = lambda x: x
     get_cnn = lambda *fs: cnn(fs, conv_op=freeze, pool_op=floating_meanpool, companion=mean_companion(f=linear))
@@ -37,7 +38,7 @@ class TestChains(unittest.TestCase):
       generator=generator
     )
 
-    a, b = gan(X, Z)
+    a, b = gan(X, X_)
     print a
     print b
 
