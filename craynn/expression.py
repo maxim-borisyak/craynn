@@ -7,7 +7,6 @@ from lasagne import layers
 from lasagne import regularization
 
 # from theano.sandbox.cuda.rng_curand import CURAND_RandomStreams as RandomStreams
-from numpy.core.tests.test_defchararray import kw_unicode_false
 from theano.sandbox.rng_mrg import MRG_RandomStreams as RandomStreams
 
 __all__ = [
