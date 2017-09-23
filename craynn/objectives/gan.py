@@ -2,7 +2,7 @@ import theano
 import theano.tensor as T
 
 __all__ = [
-  'cross_entropy_linear',
+  'cross_entropy',
   'energy_based'
 ]
 
