@@ -7,6 +7,7 @@ from lasagne import layers
 from lasagne import regularization
 
 # from theano.sandbox.cuda.rng_curand import CURAND_RandomStreams as RandomStreams
+from numpy.core.tests.test_defchararray import kw_unicode_false
 from theano.sandbox.rng_mrg import MRG_RandomStreams as RandomStreams
 
 __all__ = [
@@ -229,12 +230,11 @@ class Expression(ExpressionBase):
       return getattr(self, name)
 
   def __call__(self, *args, **kwargs):
-    #substitutes = dict(
-    #  zip(self.inputs, args) + [ (self._get_input(k), v) for (k, v) in kwargs.items() ]
-    #)
+    substitutes = dict(
+      zip(self.inputs, args)
+    )
 
-    #return layers.get_output(self.outputs, inputs=substitutes)
-    return layers.get_output(self.outputs, *args, **kwargs)
+    return layers.get_output(self.outputs, inputs=substitutes, **kwargs)
 
   def reg_l1(self):
     return regularization.regularize_network_params(self.outputs, penalty=regularization.l1)
