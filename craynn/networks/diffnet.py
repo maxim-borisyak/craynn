@@ -6,7 +6,7 @@ from .. import Expression
 from ..subnetworks import *
 from ..subnetworks.common import adjust_channels
 
-from common import *
+from .common import *
 
 from lasagne import *
 

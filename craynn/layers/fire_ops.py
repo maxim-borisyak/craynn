@@ -9,7 +9,7 @@ __all__ = [
   'squeeze'
 ]
 
-from conv_ops import get_conv_nonlinearity
+from .conv_ops import get_conv_nonlinearity
 
 class SqueezeLayer(layers.Conv2DLayer):
   def __init__(self, incoming, num_filters,

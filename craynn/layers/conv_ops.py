@@ -45,9 +45,9 @@ max_pool = lambda pool_size=(2, 2): lambda incoming: layers.MaxPool2DLayer(incom
 
 floating_maxpool = lambda pool_size=(2, 2): lambda incoming: layers.MaxPool2DLayer(
   incoming,
-  pool_size=(pool_size[0] / 2 * 3, pool_size[0] / 2 * 3),
+  pool_size=(pool_size[0] // 2 * 3, pool_size[0] // 2 * 3),
   stride=pool_size,
-  pad=(pool_size[0] / 2, pool_size[1] / 2)
+  pad=(pool_size[0] // 2, pool_size[1] // 2)
 )
 
 upscale = lambda scale_factor=(2, 2): lambda incoming: layers.Upscale2DLayer(incoming, scale_factor=scale_factor)
@@ -56,47 +56,8 @@ mean_pool = lambda pool_size=(2, 2): lambda incoming: layers.Pool2DLayer(incomin
 
 floating_meanpool = lambda pool_size=(2, 2): lambda incoming: layers.Pool2DLayer(
   incoming,
-  pool_size=(pool_size[0] / 2 * 3, pool_size[0] / 2 * 3),
+  pool_size=(pool_size[0] // 2 * 3, pool_size[0] // 2 * 3),
   stride=pool_size,
-  pad=(pool_size[0] / 2, pool_size[1] / 2),
+  pad=(pool_size[0] // 2, pool_size[1] // 2),
   mode='average_inc_pad'
 )
-
-
-def concat_conv(incoming1, incoming2, nonlinearity=nonlinearities.elu, name=None,
-                W=init.GlorotUniform(0.5),
-                avoid_concat=False, *args, **kwargs):
-  if avoid_concat:
-    conv1 = layers.Conv2DLayer(
-      incoming1, nonlinearity=nonlinearities.identity,
-      name='%s [part 1]' % (name or ''),
-      W = W,
-      *args, **kwargs
-    )
-
-    conv2 = layers.Conv2DLayer(
-      incoming2, nonlinearity=nonlinearities.identity,
-      name='%s [part 2]' % (name or ''),
-      W=W,
-      *args, **kwargs
-    )
-
-    u = layers.NonlinearityLayer(
-      layers.ElemwiseSumLayer([conv1, conv2], name='%s [sum]' % (name or '')),
-      nonlinearity=nonlinearity,
-      name='%s [nonlinearity]' % (name or '')
-    )
-
-    return u
-  else:
-    concat = layers.ConcatLayer(
-      [incoming1, incoming2], name='%s [concat]' % (name or ''),
-      cropping=[None, None, 'center', 'center']
-    )
-
-    return layers.Conv2DLayer(
-      concat,
-      nonlinearity=nonlinearity,
-      name='%s [conv]' % (name or ''),
-      *args, **kwargs
-    )

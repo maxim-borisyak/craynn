@@ -12,7 +12,7 @@ __all__ = [
   'concat_diff'
 ]
 
-from conv_ops import get_conv_nonlinearity
+from .conv_ops import get_conv_nonlinearity
 
 class Diffusion2DLayer(layers.Conv2DLayer):
   def __init__(self, incoming, num_filters, filter_size,
@@ -69,44 +69,3 @@ redist = lambda num_filters: lambda incoming: Redistribution2DLayer(
   num_filters=num_filters,
   nonlinearity=nonlinearities.linear,
 )
-
-def concat_diff(incoming1, incoming2, num_filters, filter_size=(3, 3),
-                nonlinearity=nonlinearities.elu, name=None,
-                W=Diffusion(0.8) + init.GlorotUniform(0.2),
-                *args, **kwargs):
-
-  if name is None:
-    name = 'concat+diffusion'
-
-  in_ch1 = layers.get_output_shape(incoming1)[1]
-  in_ch2 = layers.get_output_shape(incoming2)[1]
-  in_ch = in_ch1 + in_ch2
-
-  W_ = W((num_filters, in_ch,) + filter_size)
-  W1, W2 = W_[:, :in_ch1], W_[:, in_ch1:]
-
-  diff1 = Diffusion2DLayer(
-    incoming1, nonlinearity=nonlinearities.identity,
-    name='%s [part 1]' % name,
-    num_filters=num_filters,
-    filter_size=filter_size,
-    W=W1,
-    *args, **kwargs
-  )
-
-  diff2 = Diffusion2DLayer(
-    incoming2, nonlinearity=nonlinearities.identity,
-    name='%s [part 2]' % name,
-    num_filters=num_filters,
-    filter_size=filter_size,
-    W=W2,
-    *args, **kwargs
-  )
-
-  u = layers.NonlinearityLayer(
-    layers.ElemwiseSumLayer([diff1, diff2], name='%s [sum]' % name),
-    nonlinearity=nonlinearity,
-    name='%s [nonlinearity]' % name
-  )
-
-  return u

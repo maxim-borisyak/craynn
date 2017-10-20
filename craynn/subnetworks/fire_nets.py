@@ -19,7 +19,7 @@ def make_fire_module(
   merge=clayers.concat
 ):
 
-  net = squeeze(n_filters / 4)(incoming)
+  net = squeeze(n_filters // 4)(incoming)
   expanded = [ exp(n_filters)(net) for exp in expand ]
   return merge()(expanded)
 
@@ -38,7 +38,7 @@ def make_freeze_module(
 ):
   expanded = [ exp(n_filters)(incoming) for exp in expand_ops]
   net = merge(expanded)
-  return squeeze_op(n_filters / 4)(net)
+  return squeeze_op(n_filters // 4)(net)
 
 freeze_module = lambda n_filters, squeeze_op=clayers.squeeze, expand_ops=(clayers.diff, clayers.diff1x1), merge=clayers.concat(): lambda incoming: \
   make_freeze_module(incoming, n_filters, squeeze_op, expand_ops, merge)

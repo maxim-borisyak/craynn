@@ -29,7 +29,7 @@ def golden_section_search(cache_inputs, cache_direction, f, set_alpha, learning_
     fp1 = None
     fp2 = None
 
-    for i in xrange(max_iter - 1):
+    for i in range(max_iter - 1):
       fp1 = f(np.float32(p1)) if fp1 is None else fp1
       fp2 = f(np.float32(p2)) if fp2 is None else fp2
 

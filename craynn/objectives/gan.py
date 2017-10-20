@@ -6,13 +6,13 @@ __all__ = [
   'energy_based'
 ]
 
-def cross_entropy(scores_real, scores_pseudo, mode='normal'):
-  if mode == 'normal':
+def _cross_entropy(scores_real, scores_generated, mode=None):
+  if mode == 'normal' or mode is None:
     log_f = -T.log(scores_real)
-    log_1_f = -T.log(1 - scores_pseudo)
+    log_1_f = -T.log(1 - scores_generated)
   elif mode == 'linear':
     log_f = T.nnet.softplus(-scores_real)
-    log_1_f = T.nnet.softplus(scores_pseudo)
+    log_1_f = T.nnet.softplus(scores_generated)
   else:
     raise ValueError('Mode should be either normal or linear')
 
@@ -22,12 +22,14 @@ def cross_entropy(scores_real, scores_pseudo, mode='normal'):
 
   return 0.5 * (loss_real + loss_pseudo), loss_pseudo
 
+cross_entropy = lambda mode=None: lambda scores_real, scores_pseudo: \
+  _cross_entropy(scores_real, scores_pseudo, mode)
 
-def energy_based(X_original, X_generated, discriminator, margin = 1):
-  score_original, = discriminator(X_original)
-  score_generated, = discriminator(X_generated)
-
+def _energy_based(scores_real, scores_generated, margin = 1):
   zero = T.constant(0.0, dtype='float32')
-  margin = T.constant(margin, dtype='float32')
+  loss_discriminator = T.mean(scores_real) + T.mean(T.maximum(zero, margin - scores_generated))
+  loss_generator = T.mean(scores_generated)
+  return  loss_discriminator, loss_generator
 
-  return T.mean(score_original) + T.mean(T.maximum(zero, margin - score_generated)), T.mean(score_generated)
+energy_based = lambda margin=1: lambda scores_real, scores_generated: \
+  _energy_based(scores_real, scores_generated, margin)

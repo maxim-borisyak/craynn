@@ -209,7 +209,7 @@ def _plot_heat_map(net, X, figsize, get_heat_image):
 
     num_images = X.shape[0]
     if figsize[1] is None:
-        figsize = (figsize[0], num_images * figsize[0] / 3)
+        figsize = (figsize[0], num_images * figsize[0] // 3)
     figs, axes = plt.subplots(num_images, 3, figsize=figsize)
 
     for ax in axes.flatten():

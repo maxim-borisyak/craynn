@@ -48,7 +48,7 @@ class ExpressionBase(object):
 
   @snapshot_index.setter
   def snapshot_index(self, value):
-    assert type(value) in [long, int] or value is None
+    assert type(value) is int or value is None
     self._snapshot_index = value
 
   @property
@@ -117,10 +117,7 @@ class ExpressionBase(object):
     instance.snapshot_index = count
 
   def save(self, path):
-    try:
-      import cPickle as pickle
-    except:
-      import pickle
+    import pickle
 
     try:
       os.mkdir(path)
@@ -151,10 +148,7 @@ class ExpressionBase(object):
 
   @classmethod
   def load(cls, path):
-    try:
-      import cPickle as pickle
-    except:
-      import pickle
+    import pickle
 
     with open(osp.join(path, 'args.pickled'), 'r') as f:
       args, kwargs = pickle.load(f)
@@ -168,10 +162,7 @@ class ExpressionBase(object):
     return net
 
   def reset_weights(self, path):
-    try:
-      import cPickle as pickle
-    except:
-      import pickle
+    import pickle
 
     with open(osp.join(path, 'weights.pickled'), 'r') as f:
       params = pickle.load(f)
@@ -193,7 +184,7 @@ class ExpressionBase(object):
 
   def reset_to_latest(self, dump_dir=None):
     dump_dir = dump_dir or self._dump_dir
-    self.reset_weights(osp.join(dump_dir, 'snapshot_%06d' % self._snapshot_index))
+    self.reset_weights(osp.join(dump_dir, 'snapshot_%06d' % (self._snapshot_index or -1)))
 
     return self
 

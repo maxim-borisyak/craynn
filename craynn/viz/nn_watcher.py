@@ -7,7 +7,10 @@ __all__ = [
   'SNNWatcher'
 ]
 
-from IPython import display
+try:
+  from IPython import display
+except ImportError:
+  pass
 
 class NNWatcher(object):
   limit = 2 ** 15
@@ -65,7 +68,7 @@ class NNWatcher(object):
   def draw(self, *data):
     def crop(d):
       epoch_size = np.prod(d.shape[1:])
-      lim = self.limit / epoch_size
+      lim = self.limit // epoch_size
 
       return d[-lim:]
 
@@ -137,7 +140,7 @@ class SNNWatcher(object):
     def crop(d):
       if self.mode == 'full':
         epoch_size = np.prod(d.shape[1:])
-        lim = self.limit / epoch_size
+        lim = self.limit // epoch_size
         return d[-lim:]
       else:
         return d

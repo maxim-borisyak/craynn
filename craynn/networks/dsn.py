@@ -1,6 +1,6 @@
 from lasagne import *
 
-from common import *
+from .common import *
 from .. import Expression
 from ..subnetworks import companion
 

@@ -23,7 +23,7 @@ def make_transfer_reg_mask(shape, alpha=1.0e-1, dtype='float32'):
 
   filter_size = shape[2:]
 
-  filter_center = (filter_size[0] - 1) / 2
+  filter_center = (filter_size[0] - 1) // 2
 
   for i in range(min(shape[:2])):
     mask[i, i] = alpha
@@ -35,7 +35,7 @@ def make_identity_conv(shape, dtype='float32'):
   mask = np.zeros(shape, dtype=dtype)
 
   filter_size = shape[2:]
-  cx, cy = filter_size[0] / 2, filter_size[1] / 2
+  cx, cy = filter_size[0] // 2, filter_size[1] // 2
 
   for i in range(min(shape[:2])):
     mask[i, i, cx, cy] = 1.0

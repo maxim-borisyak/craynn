@@ -39,8 +39,8 @@ class TestChains(unittest.TestCase):
     )
 
     a, b = gan(X, X_)
-    print a
-    print b
+    print(a)
+    print(b)
 
 
 if __name__ == '__main__':

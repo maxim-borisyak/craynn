@@ -1,7 +1,7 @@
 from .. import Expression
 from ..layers import *
 
-from common import *
+from .common import *
 from ..subnetworks import cnn, cae
 from ..subnetworks import max_companion
 

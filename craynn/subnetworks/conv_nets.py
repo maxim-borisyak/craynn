@@ -5,7 +5,7 @@ from ..layers import *
 from .common import complete_conv_kwargs, complete_deconv_kwargs, get_deconv_kwargs
 from .common import chain
 
-from ..layers.conv_ops import get_conv_nonlinearity, get_companion_nonlinearity
+from ..layers.conv_ops import get_companion_nonlinearity
 
 __all__ = [
   'cnn',

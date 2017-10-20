@@ -1,7 +1,7 @@
 from lasagne import *
 
-from conv_ops import max_pool, upscale, floating_maxpool
-from common import concat
+from .conv_ops import max_pool, upscale, floating_maxpool
+from .common import concat
 
 __all__ = [
   'scale_to',
@@ -20,7 +20,7 @@ def scale_to(net, target, pool=max_pool, upscale=upscale):
     if tw % ow != 0 or th % oh != 0:
       raise Exception('Impossible to upscale (%d, %d) to (%d, %d)' % (ow, oh, tw, th))
 
-    scale = (tw / ow, th / oh)
+    scale = (tw // ow, th // oh)
     return upscale(net, scale_factor=scale)
   elif ow == th or oh == th:
     return net
@@ -29,7 +29,7 @@ def scale_to(net, target, pool=max_pool, upscale=upscale):
     if ow % ow != 0 or oh % th != 0:
       raise Exception('Impossible to downscale (%d, %d) to (%d, %d)' % (ow, oh, tw, th))
 
-    pool_size = (ow / tw, oh / th)
+    pool_size = (ow // tw, oh // th)
 
     return pool(net, pool_size=pool_size)
 

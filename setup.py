@@ -15,7 +15,7 @@ with open(osp.join(here, 'README.md'), encoding='utf-8') as f:
 setup(
   name = 'craynn',
 
-  version='0.9.0',
+  version='0.9.1',
 
   description="""Yet another neural network toolkit.""",
 
@@ -40,9 +40,7 @@ setup(
 
     'License :: OSI Approved :: MIT License',
 
-    'Programming Language :: Python :: 2',
-    'Programming Language :: Python :: 2.6',
-    'Programming Language :: Python :: 2.7',
+    'Programming Language :: Python :: 3',
   ],
 
   keywords='neural networks',
@@ -60,7 +58,7 @@ setup(
     'matplotlib',
     'theano',
     'lasagne',
-    'pydot',
+    'pydotplus',
   ],
 
   include_package_data=True,

@@ -15,11 +15,11 @@ class SumOfInitializers(Initializer):
   def sample(self, shape):
     return self.this.sample(shape) + self.that.sample(shape)
 
-class InitializerWithSum(Initializer):
+class InitializerWithSum(object):
   def __add__(self, other):
     return SumOfInitializers(self, other)
 
-class Diffusion(InitializerWithSum):
+class Diffusion(Initializer, InitializerWithSum):
   def __init__(self, gain=1.0, offset=0):
     self.gain = gain
     self.offset = offset
@@ -28,7 +28,7 @@ class Diffusion(InitializerWithSum):
     assert len(shape) == 4, 'Diffusion init is only for convolutional layers'
 
     id_conv = np.zeros(shape=shape[2:])
-    cx, cy = shape[2] / 2, shape[3] / 2
+    cx, cy = shape[2] // 2, shape[3] // 2
     id_conv[cx, cy] = 1.0 / shape[0] * shape[1]
 
     s = np.zeros(shape=shape)

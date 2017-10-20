@@ -2,7 +2,7 @@ from .. import Expression
 
 from ..subnetworks import *
 
-from common import *
+from .common import *
 
 from lasagne import *
 

@@ -1,2 +1,2 @@
-from image import *
-from gan import *
+from .image import *
+from .gan import *

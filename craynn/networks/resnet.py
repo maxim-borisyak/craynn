@@ -1,7 +1,7 @@
 from .. import Expression
 from lasagne import *
 
-from common import *
+from .common import *
 from craynn.subnetworks import make_resnet, make_resae
 
 __all__ = [

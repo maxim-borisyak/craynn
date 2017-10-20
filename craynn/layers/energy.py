@@ -6,7 +6,7 @@ from . import Redistribution2DLayer
 
 __all__ = [
   'energy_pooling',
-  'energy_pool',
+  'epool2d', 'energy2d',
   'Energy2DLayer'
 ]
 
@@ -27,7 +27,7 @@ def energy_pooling(exclude_borders=None, img_shape = None, norm=True, dtype='flo
     else:
       return lambda x: T.sum(x, axis=(2, 3))
 
-def energy_pool(layer, n_channels = 1, exclude_borders=None, norm=True, dtype='float32'):
+def _energy_pool(layer, n_channels = 1, exclude_borders=None, norm=True, dtype='float32'):
   img_shape = layers.get_output_shape(layer)
   if img_shape[1] != n_channels:
     layer = Redistribution2DLayer(layer, num_filters=n_channels, nonlinearity=nonlinearities.linear)
@@ -38,6 +38,9 @@ def energy_pool(layer, n_channels = 1, exclude_borders=None, norm=True, dtype='f
   net = layers.ExpressionLayer(layer, pool, output_shape=img_shape[:2], name='Energy pool')
 
   return net
+
+epool2d = lambda n_channels=1, exclude_borders=None, norm=True, dtype='float32': lambda incoming: \
+  _energy_pool(incoming, n_channels=1, exclude_borders=None, norm=True, dtype='float32')
 
 from ..objectives import plain_mse
 
@@ -56,3 +59,6 @@ class Energy2DLayer(layers.MergeLayer):
   def get_output_for(self, inputs, **kwargs):
     a, b = inputs
     return self.energy_function(a, b)
+
+energy2d = lambda energy_f = plain_mse: lambda incomings: \
+  Energy2DLayer(incomings, energy_function=energy_f)

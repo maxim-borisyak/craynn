@@ -1,4 +1,4 @@
-from common import complete_conv_kwargs
+from .common import complete_conv_kwargs
 
 from lasagne import *
 

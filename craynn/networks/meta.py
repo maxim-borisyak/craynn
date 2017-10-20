@@ -1,4 +1,4 @@
-from common import *
+from .common import *
 from craynn import Expression
 
 __all__ = [

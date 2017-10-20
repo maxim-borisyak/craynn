@@ -1,4 +1,3 @@
-from scipy.misc import toimage, imsave
 import os
 import os.path as osp
 
@@ -9,12 +8,14 @@ __all__ = [
 ]
 
 def pack_images(output, imgs, vmax=1024.0, archive=None, name="image_%d.png", **data):
+  from scipy.misc import toimage, imsave
+
   try:
     os.makedirs(output)
   except:
     pass
 
-  for i in xrange(imgs.shape[0]):
+  for i in range(imgs.shape[0]):
     args = dict([ (k, v[i]) for k, v in data.items()])
     args['index'] = i
 
@@ -86,5 +87,5 @@ def plot_and_pack(imgs, outdir='output', pack=True, name="image_{index}.png",
   if pack:
     basedir, cwd = osp.split(outdir)
     tar_path = osp.join(basedir, '%s.tar.gz' % cwd)
-    print 'Archive', tar_path
+    print('Archive', tar_path)
     return os.system('tar -czf %s %s ' % (tar_path, outdir))

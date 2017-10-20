@@ -8,7 +8,7 @@ import os.path as osp
 import itertools
 
 import threading
-from Queue import Queue
+from queue import Queue
 
 __all__ = [
   'random',
@@ -23,17 +23,17 @@ __all__ = [
 
 def random(n_samples, batch_size=128, n_batches=None, replace=True, priors=None):
   if n_batches is None:
-    n_batches = n_samples / batch_size
+    n_batches = n_samples // batch_size
 
-  for i in xrange(n_batches):
+  for i in range(n_batches):
     yield np.random.choice(n_samples, size=batch_size, replace=replace, p=priors)
 
 def seq(n_samples, batch_size=128):
   indx = np.arange(n_samples)
 
-  n_batches = n_samples / batch_size + (1 if n_samples % batch_size != 0 else 0)
+  n_batches = n_samples // batch_size + (1 if n_samples % batch_size != 0 else 0)
 
-  for i in xrange(n_batches):
+  for i in range(n_batches):
     i_from = i * batch_size
     i_to = i_from + batch_size
     yield indx[i_from:i_to]
@@ -41,20 +41,20 @@ def seq(n_samples, batch_size=128):
 def random_seq(n_samples, batch_size=128, allow_smaller=False):
   indx = np.random.permutation(n_samples)
 
-  n_batches = n_samples / batch_size + (1 if (n_samples % batch_size != 0) and allow_smaller else 0)
+  n_batches = n_samples // batch_size + (1 if (n_samples % batch_size != 0) and allow_smaller else 0)
 
-  for i in xrange(n_batches):
+  for i in range(n_batches):
     i_from = i * batch_size
     i_to = i_from + batch_size
     yield indx[i_from:i_to]
 
 def inf_random_seq(n_samples, batch_size=128, allow_smaller=False):
-  n_batches = n_samples / batch_size + (1 if (n_samples % batch_size != 0) and allow_smaller else 0)
+  n_batches = n_samples // batch_size + (1 if (n_samples % batch_size != 0) and allow_smaller else 0)
 
   while True:
     indx = np.random.permutation(n_samples)
 
-    for i in xrange(n_batches):
+    for i in range(n_batches):
       i_from = i * batch_size
       i_to = i_from + batch_size
       yield indx[i_from:i_to]
@@ -71,12 +71,12 @@ def binned(target_statistics, batch_size, n_batches, n_bins=64):
   indicies_categories = np.array_split(indx, np.cumsum(hist)[:-1])
   n_samples = target_statistics.shape[0]
 
-  per_category = batch_size / n_bins
+  per_category = batch_size // n_bins
 
   weight_correction = (n_bins * np.float64(hist) / n_samples).astype('float32')
   wc = np.repeat(weight_correction, per_category)
 
-  for i in xrange(n_batches):
+  for i in range(n_batches):
     sample = [
       np.random.choice(ind, size=per_category, replace=True)
       for ind in indicies_categories
@@ -96,7 +96,7 @@ def hdf5_batch_worker(path, out_queue, batch_sizes):
     f['bin_%d' % i] for i in range(n_bins)
   ]
 
-  if type(batch_sizes) in [long, int]:
+  if type(batch_sizes) is int:
     batch_sizes = [batch_sizes] * len(datasets)
 
   indxes_stream = itertools.izip(*[
@@ -124,7 +124,7 @@ def hdf5(path, batch_sizes=8):
     f['bin_%d' % i] for i in range(n_bins)
   ]
 
-  if type(batch_sizes) in [long, int]:
+  if type(batch_sizes) is int:
     batch_sizes = [batch_sizes] * len(datasets)
 
   indxes_stream = itertools.izip(*[
@@ -165,7 +165,7 @@ def np_from_disk(data_root, batch_sizes=8, cache_size=16, mmap_mode='r'):
     for i in range(len(os.listdir(data_root)))
   ]
 
-  if type(batch_sizes) in [long, int]:
+  if type(batch_sizes) is int:
     batch_sizes = [batch_sizes] * len(bin_patches)
 
   queues = [ Queue(maxsize=cache_size) for _ in bin_patches ]
