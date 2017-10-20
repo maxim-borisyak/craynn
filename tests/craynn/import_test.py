@@ -1,5 +1,9 @@
 import unittest
 
+import craynn
+from craynn.layers import *
+from craynn.subnetworks import *
+from craynn.networks import *
 
 class ImportTest(unittest.TestCase):
   def test_import(self):

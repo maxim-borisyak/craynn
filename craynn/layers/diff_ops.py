@@ -8,8 +8,7 @@ __all__ = [
   'Redistribution2DLayer',
   'diff',
   'diff1x1',
-  'redist',
-  'concat_diff'
+  'redist'
 ]
 
 from .conv_ops import get_conv_nonlinearity
