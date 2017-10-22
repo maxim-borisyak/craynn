@@ -25,12 +25,12 @@ def make_downprop_block(incomings, base_blocks, up=upscale(), down=max_pool(), c
     if net is None:
       net = base(origin)
     else:
-      net = concat(up(net), origin)
+      net = concat([up(net), origin])
       net = base(net)
 
     outputs.append(net)
 
-  return outputs
+  return outputs[::-1]
 
 downprop = lambda base_blocks, up=upscale(), down=max_pool(), concat=concat(): \
   lambda incomings: make_downprop_block(incomings, base_blocks, up, down, concat)
@@ -44,7 +44,7 @@ def make_upprop_block(incomings, base_blocks, down=max_pool(), concat=concat()):
     if net is None:
       net = base(origin)
     else:
-      net = concat(down(net), origin)
+      net = concat([down(net), origin])
       net = base(net)
 
     outputs.append(net)
