@@ -16,11 +16,6 @@ __all__ = [
 ]
 
 class DiffusionNet(Expression):
-  """
-  Similar to ResNetAE, however, does not decrease size of the image.
-  The model contains identity transformation, thus, useless as AE,
-  however, might be useful as image to image network.
-  """
   def __init__(self,
                channels, block_depth, block_length,
                noise_sigma=1.0 / 1024,
