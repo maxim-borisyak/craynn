@@ -1,8 +1,6 @@
 from lasagne import *
 import theano.tensor as T
 
-from ..init import Diffusion
-
 __all__ = [
   'Diffusion2DLayer',
   'Redistribution2DLayer',

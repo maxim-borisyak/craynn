@@ -10,7 +10,7 @@ __all__ = [
 try:
   from IPython import display
 except ImportError:
-  pass
+  display = None
 
 class NNWatcher(object):
   limit = 2 ** 15

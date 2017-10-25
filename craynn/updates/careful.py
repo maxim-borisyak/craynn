@@ -3,7 +3,6 @@ import numpy as np
 import theano
 import theano.tensor as T
 
-from lasagne import updates
 from lasagne.updates import get_or_compute_grads, total_norm_constraint
 from collections import OrderedDict
 

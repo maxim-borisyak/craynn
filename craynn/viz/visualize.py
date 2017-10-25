@@ -203,7 +203,7 @@ def occlusion_heatmap(net, x, target, square_length=7):
 
 
 def _plot_heat_map(net, X, figsize, get_heat_image):
-    if (X.ndim != 4):
+    if X.ndim != 4:
         raise ValueError("This function requires the input data to be of "
                          "shape (b, c, x, y), instead got {}".format(X.shape))
 

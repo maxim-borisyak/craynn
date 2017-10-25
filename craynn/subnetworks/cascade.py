@@ -1,6 +1,3 @@
-import numpy as np
-import theano
-import theano.tensor as T
 from lasagne import *
 
 from .. import layers as clayers
@@ -20,24 +17,24 @@ __all__ = [
 
 get_interest_kernels = lambda net: get_kernels_by_type(net, 'interest_kernel')
 
-def cascade_merge(incomings, merge=clayers.min, scale=clayers.scale_to):
+def cascade_merge(incomings, merge=clayers.minimum, scale=clayers.scale_to):
   a, b = incomings
   b = scale(b, a)
   return merge([a, b])
 
-def cascade_merge_rev(incomings, merge=clayers.min, scale=clayers.scale_to):
+def cascade_merge_rev(incomings, merge=clayers.minimum, scale=clayers.scale_to):
   a, b = incomings
   a = scale(a, b)
   return merge([a, b])
 
-def cascade_merge_const(incomings, target_shape, merge=clayers.min, scale=clayers.scale_to):
+def cascade_merge_const(incomings, target_shape, merge=clayers.minimum, scale=clayers.scale_to):
   a, b = incomings
   a = scale(a, target_shape)
   b = scale(b, target_shape)
 
   return merge([a, b])
 
-def dropout_merge_const(incomings, p, target_shape, merge=clayers.min, scale=clayers.scale_to):
+def dropout_merge_const(incomings, p, target_shape, merge=clayers.minimum, scale=clayers.scale_to):
   a, b = incomings
   a = scale(a, target_shape)
   b = scale(b, target_shape)

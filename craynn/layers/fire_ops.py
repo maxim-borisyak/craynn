@@ -1,7 +1,4 @@
-import numpy as np
 from lasagne import *
-
-import theano
 import theano.tensor as T
 
 __all__ = [

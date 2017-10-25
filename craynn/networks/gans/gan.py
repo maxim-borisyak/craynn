@@ -1,4 +1,3 @@
-import theano
 import theano.tensor as T
 
 from ...objectives import energy_based

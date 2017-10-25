@@ -199,9 +199,6 @@ class Expression(ExpressionBase):
     :param outputs: list of output layers
     """
     self.inputs = inputs
-
-    self._named_inputs = dict([ (l.name, l) for l in self.inputs ])
-
     self.outputs = outputs
 
     self._args = ()
@@ -212,17 +209,26 @@ class Expression(ExpressionBase):
 
     super(Expression, self).__init__()
 
-  def _get_input(self, name):
-    if name in self._named_inputs:
-      return self._named_inputs[name]
-    else:
-      assert getattr(self, name) in self.inputs
-      return getattr(self, name)
-
   def __call__(self, *args, **kwargs):
-    substitutes = dict(
-      zip(self.inputs, args)
-    )
+    external_inputs = [
+      input for input in self.inputs if not hasattr(input, 'get_autoinput')
+    ]
+    auto_inputs = [
+      input for input in self.inputs if hasattr(input, 'get_autoinput')
+    ]
+    external_substitutes = dict(zip(external_inputs, args))
+    auto_substitutes = dict()
+
+    for auto_input in auto_inputs:
+      if auto_input.linked_layer is not None:
+        linked = external_substitutes[auto_input.linked_layer]
+      else:
+        linked = None
+
+      auto_substitutes[auto_input] = auto_input.get_autoinput(linked)
+
+    substitutes = external_substitutes.copy()
+    substitutes.update(auto_substitutes)
 
     return layers.get_output(self.outputs, inputs=substitutes, **kwargs)
 

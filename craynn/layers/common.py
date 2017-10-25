@@ -1,14 +1,20 @@
-from lasagne import layers
+from lasagne import layers, nonlinearities
 
 import theano.tensor as T
 
 __all__ = [
-  'min', 'max', 'concat', 'noise', 'nothing'
+  'minimum', 'maximum', 'concat', 'noise', 'nothing', 'dropout', 'dense'
 ]
 
-min = lambda: lambda incomings: layers.ElemwiseMergeLayer(incomings, merge_function=T.minimum)
-max = lambda: lambda incomings: layers.ElemwiseMergeLayer(incomings, merge_function=T.maximum)
+minimum = lambda: lambda incomings: layers.ElemwiseMergeLayer(incomings, merge_function=T.minimum)
+maximum = lambda: lambda incomings: layers.ElemwiseMergeLayer(incomings, merge_function=T.maximum)
 concat = lambda axis=1: lambda incomings: layers.ConcatLayer(incomings, axis=axis)
 
 noise = lambda sigma=0.1: lambda incoming: layers.GaussianNoiseLayer(incoming, sigma=sigma)
 nothing = lambda incoming: incoming
+
+
+dense = lambda num_units, f=None: lambda incoming: \
+  layers.DenseLayer(incoming, num_units=num_units, nonlinearity=(nonlinearities.LeakyRectify(0.05) if f is None else f))
+
+dropout = lambda p=0.1, rescale=True: lambda incoming: layers.DropoutLayer(incoming, p=p)

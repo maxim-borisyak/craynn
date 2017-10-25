@@ -8,7 +8,7 @@ __all__ = [
 ]
 
 def pack_images(output, imgs, vmax=1024.0, archive=None, name="image_%d.png", **data):
-  from scipy.misc import toimage, imsave
+  from scipy.misc import toimage
 
   try:
     os.makedirs(output)

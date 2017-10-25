@@ -1,53 +1,34 @@
-import numpy as np
-
-import theano
-import theano.tensor as T
-
 from lasagne import *
 
 from craynn import Expression
 
+from ..subnetworks import achain
+
 __all__ = [
   'Net', 'net',
-  'factory',
-  'get_input_layer',
-  'get_noise_layer',
-  'default_cls'
+  'get_input_layer'
 ]
 
-def factory(cls):
-  return lambda *args, **kwargs: lambda input = None: cls(*args, input_layer=input, **kwargs)
-
-def default_cls(cls):
-  def gen(depth = 3, initial_filters = 4, *args, **kwargs):
-    n_filters = [ initial_filters * (2**i) for i in range(depth) ]
-    return cls(n_filters, *args, **kwargs)
-  return gen
-
-def get_input_layer(img_shape, input_layer):
-  if input_layer is None:
-    return layers.InputLayer(
-      shape=(None,) + img_shape,
-      name='input'
-    )
+def get_input_layer(shape_or_layer, index=None):
+  if hasattr(shape_or_layer, '__iter__') and all([ type(s) is int for s in shape_or_layer ]):
+    name = 'input' if index is None else 'input%d' % index
+    return layers.InputLayer(shape=shape_or_layer, name=name)
   else:
-    return input_layer
-
-def get_noise_layer(input_layer, sigma=None):
-  if sigma is not None:
-    return layers.GaussianNoiseLayer(input_layer, sigma=sigma, name='noise')
-  else:
-    return input_layer
+    return shape_or_layer
 
 
 class Net(Expression):
-  def __init__(self, factory, img_shape=None, input_layer=None):
-    self.input_layer = get_input_layer(img_shape, input_layer)
-    net = factory(self.input_layer)
+  def __init__(self, factory, inputs):
+    input_layers = []
+    for i, input in enumerate(inputs):
+      input_layers.append(get_input_layer(input, i))
 
-    if not hasattr(net, '__iter__'):
-      net = [net]
+    outputs = factory(input_layers)
 
-    super(Net, self).__init__([self.input_layer], net)
+    if not hasattr(outputs, '__iter__'):
+      outputs = [outputs]
 
-net = lambda factory, img_shape=None, input_layer=None: Net(factory, img_shape, input_layer)
+    super(Net, self).__init__(input_layers, outputs)
+
+
+net = lambda *inputs: lambda *factory: Net(achain(*factory), inputs)

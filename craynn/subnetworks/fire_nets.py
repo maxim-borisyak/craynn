@@ -1,8 +1,3 @@
-import numpy as np
-import theano
-import theano.tensor as T
-from lasagne import *
-
 from .. import layers as clayers
 
 __all__ = [
