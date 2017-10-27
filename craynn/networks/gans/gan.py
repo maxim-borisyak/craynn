@@ -1,5 +1,7 @@
 import theano.tensor as T
 
+from functools import reduce
+
 from ...objectives import energy_based
 
 __all__ = [
@@ -58,7 +60,7 @@ class GAN(object):
 class CycleGAN(object):
   def __init__(self,
                XtoY, discriminator_Y, YtoX=None, discriminator_X=None,
-               adversarial_loss_Y=energy_based(), adversarial_loss_X=None,
+               loss_Y=energy_based(), loss_X=None,
                loss_XY=None, loss_YX=None,
                loss_XYX=None, loss_YXY=None
                ):
@@ -68,8 +70,8 @@ class CycleGAN(object):
     self.discriminator_X = discriminator_X
     self.discriminator_Y = discriminator_Y
 
-    self.adversarial_loss_X = adversarial_loss_X
-    self.adversarial_loss_Y = adversarial_loss_Y
+    self.loss_X = loss_X
+    self.loss_Y = loss_Y
 
     self.loss_XY = loss_XY
     self.loss_YX = loss_YX
@@ -78,54 +80,56 @@ class CycleGAN(object):
     self.loss_YXY = loss_YXY
 
   def __call__(self, X, Y):
+    def apply(f, *args):
+      if f is None or any([arg is None for arg in args]):
+        return None
+      else:
+        return f(*args)
+
     ### GAN losses in Y domain
-    XY = self.XtoY(X)
+    XY, = self.XtoY(X)
 
     score_Y, = self.discriminator_Y(Y)
     score_XY, = self.discriminator_Y(XY)
 
-    self.gan_loss_discriminator_Y, self.gan_loss_XtoY = self.adversarial_loss_Y(score_Y, score_XY)
+    ### adversarial loss in Y domain, i.e. vanila GAN loss
+    self.adv_loss_discriminator_Y, self.adv_loss_XtoY = self.loss_Y(score_Y, score_XY)
 
-    ### GAN losses in X domain
-    YX, = self.YtoX(Y)
+    ### losses of X -> Y
+    self.semi_cycle_loss_XY = apply(self.loss_XY, X, XY)
 
-    score_X, = self.discriminator_X(X)
-    score_YX, = self.discriminator_X(YX)
+    YX, = apply(self.YtoX, Y)
+    YXY, = apply(self.XtoY, YX)
+    XYX, = apply(self.YtoX, XY)
 
-    self.gan_loss_discriminator_X, self.gan_loss_YtoX = self.adversarial_loss_X(score_X, score_YX)
+    ### adversarial loss in X domain
+    score_X, = apply(self.discriminator_X, X)
+    score_YX, = apply(self.discriminator_X, YX)
+    self.adv_loss_discriminator_X, self.adv_loss_YtoX = apply(self.loss_X, score_X, score_YX)
 
-    ### X -> Y -> X cycle loss
-
-    XYX, = self.YtoX(XY)
-
-    self.cycle_loss_X = self.cycle_loss_X(X, XYX)
-
-    if self.aux_loss_YtoX is not None:
-      self.cycle_loss_X += self.cycle_loss_coef_X * self.aux_loss_YtoX(X, XYX)
-
-    ### Y -> X -> Y cycle loss
-
-    Y_cycled, = self.XtoY(YX)
-    self.cycle_loss_Y = self.cycle_loss_Y(Y, Y_cycled)
-
-    if self.aux_loss_XtoY is not None:
-      self.cycle_loss_Y += self.cycle_loss_coef_Y * self.aux_loss_XtoY(Y, Y_cycled)
+    ### losses of Y -> X
+    self.semi_cycle_loss_YX = apply(self.loss_YX, Y, YX)
 
 
-    self.full_loss_XtoY = self.gan_loss_XtoY + self.cycle_loss_coef_Y * self.cycle_loss_Y
+    ### cycle loss X -> Y -> X
+    self.cycle_loss_XYX = apply(self.loss_XYX, X, XYX)
 
-    self.full_loss_reverse = self.gan_loss_YtoX + self.cycle_loss_coef_X * self.cycle_loss_X
+    ### cycle loss Y -> X -> Y
+    self.cycle_loss_YXY = apply(self.loss_YXY, Y, YXY)
 
+
+    self.loss_generator = reduce(lambda a, b: a + b, [
+      l for l in [
+        self.adv_loss_XtoY, self.adv_loss_YtoX,
+        self.semi_cycle_loss_YX, self.semi_cycle_loss_XY,
+        self.cycle_loss_YXY, self.cycle_loss_YXY
+      ] if l is not None
+    ])
 
     return (
-      self.gan_loss_discriminator_Y,
-      self.gan_loss_discriminator_X,
-      self.full_loss_XtoY,
-      self.full_loss_reverse,
-      self.gan_loss_XtoY,
-      self.gan_loss_YtoX,
-      self.cycle_loss_Y,
-      self.cycle_loss_X
+      self.adv_loss_discriminator_Y,
+      self.adv_loss_discriminator_X,
+      self.loss_generator
     )
 
 class StageGAN(object):

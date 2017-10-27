@@ -2,7 +2,7 @@ import numpy as np
 import theano.tensor as T
 from lasagne import *
 
-from . import Redistribution2DLayer
+from . import ChannelPooling2DLayer
 
 __all__ = [
   'energy_pooling',
@@ -30,7 +30,7 @@ def energy_pooling(exclude_borders=None, img_shape = None, norm=True, dtype='flo
 def _energy_pool(layer, n_channels = 1, exclude_borders=None, norm=True, dtype='float32'):
   img_shape = layers.get_output_shape(layer)
   if img_shape[1] != n_channels:
-    layer = Redistribution2DLayer(layer, num_filters=n_channels, nonlinearity=nonlinearities.linear)
+    layer = ChannelPooling2DLayer(layer, num_filters=n_channels, nonlinearity=nonlinearities.linear)
 
   img_shape = layers.get_output_shape(layer)
 

@@ -35,7 +35,7 @@ class ExpressionBase(object):
     hyperparam_str = ', '.join([args_str, kwargs_str])
 
     return "%s(%s)" % (
-      str(self.__class__),
+      str(type(self).__name__),
       hyperparam_str
     )
 

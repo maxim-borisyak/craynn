@@ -7,6 +7,7 @@ __all__ = [
   'floating_scale_to',
 ]
 
+
 def scale_to(net, target, pool=max_pool, upscale=upscale):
   ow, oh = layers.get_output_shape(net)[-2:]
   try:

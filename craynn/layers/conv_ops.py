@@ -78,3 +78,5 @@ floating_meanpool = lambda pool_size=(2, 2): lambda incoming: layers.Pool2DLayer
   pad=(pool_size[0] // 2, pool_size[1] // 2),
   mode='average_inc_pad'
 )
+
+global_pool = lambda f=None: lambda incoming: layers.GlobalPoolLayer(incoming, pool_function=f)

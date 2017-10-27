@@ -3,7 +3,8 @@ from lasagne import layers, nonlinearities
 import theano.tensor as T
 
 __all__ = [
-  'take', 'minimum', 'maximum', 'concat', 'noise', 'nothing', 'dropout', 'dense', 'batch_norm'
+  'take', 'minimum', 'maximum', 'concat', 'noise', 'nothing', 'dropout', 'dense', 'batch_norm',
+  'elementwise'
 ]
 
 minimum = lambda: lambda incomings: layers.ElemwiseMergeLayer(incomings, merge_function=T.minimum)
@@ -25,3 +26,5 @@ class Take(object):
     return lambda incomings: incomings[item]
 
 take = Take()
+
+elementwise = lambda f=T.add: lambda incomings: layers.ElemwiseMergeLayer(incomings, f)

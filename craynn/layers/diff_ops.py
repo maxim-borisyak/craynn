@@ -3,10 +3,9 @@ import theano.tensor as T
 
 __all__ = [
   'Diffusion2DLayer',
-  'Redistribution2DLayer',
-  'diff',
-  'diff1x1',
-  'redist'
+  'ChannelPooling2DLayer',
+  'diff', 'diff1x1',
+  'channel_pool', 'channel_rpool'
 ]
 
 from .conv_ops import get_conv_nonlinearity
@@ -45,7 +44,7 @@ diff1x1 = lambda num_filters, f=None: lambda incoming: Diffusion2DLayer(
   nonlinearity=get_conv_nonlinearity(f),
 )
 
-class Redistribution2DLayer(layers.Conv2DLayer):
+class ChannelPooling2DLayer(layers.Conv2DLayer):
   def __init__(self, incoming, num_filters,
                untie_biases=False,
                W=init.GlorotUniform(1.0),
@@ -56,16 +55,22 @@ class Redistribution2DLayer(layers.Conv2DLayer):
     filter_size = (1, 1)
     flip_filters = True
     b = None
-    super(Redistribution2DLayer, self).__init__(incoming, num_filters, filter_size,
+    super(ChannelPooling2DLayer, self).__init__(incoming, num_filters, filter_size,
                                                 stride, pad, untie_biases, W, b,
                                                 nonlinearity, flip_filters, convolution,
                                                 **kwargs)
 
-  def redistribution_kernel(self):
+  def channel_pooling_kernel(self):
     return self.W
 
-redist = lambda num_filters: lambda incoming: Redistribution2DLayer(
+channel_pool = lambda num_filters: lambda incoming: ChannelPooling2DLayer(
   incoming=incoming,
   num_filters=num_filters,
+  nonlinearity=nonlinearities.linear,
+)
+
+channel_rpool = lambda channel_factor=2: lambda incoming: ChannelPooling2DLayer(
+  incoming=incoming,
+  num_filters=layers.get_output_shape(incoming)[1] // channel_factor,
   nonlinearity=nonlinearities.linear,
 )

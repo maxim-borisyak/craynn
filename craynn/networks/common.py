@@ -5,7 +5,6 @@ from craynn import Expression
 from ..subnetworks import achain
 
 
-
 __all__ = [
   'Net', 'net',
   'get_input_layer'

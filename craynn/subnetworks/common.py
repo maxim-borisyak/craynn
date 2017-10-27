@@ -1,5 +1,5 @@
 from lasagne import *
-from ..layers import redist
+from ..layers import channel_pool
 
 __all__ = [
   'adjust_channels',
@@ -19,7 +19,7 @@ def get_kernels_by_type(net, kernel_type):
 
   return kernels
 
-def adjust_channels(incoming, target_channels, redist=redist):
+def adjust_channels(incoming, target_channels, redist=channel_pool):
   input_channels = layers.get_output_shape(incoming)[1]
 
   if input_channels != target_channels:
