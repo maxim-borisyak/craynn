@@ -10,13 +10,13 @@ class TestChains(unittest.TestCase):
   def test_import(self):
 
     test_input = layers.InputLayer(shape=(None, 1, 256, 256))
+    downblock = lambda n_filters: achain(diff(n_filters), max_pool())
+    upblock = lambda n_filters: achain(upconv(), diff(n_filters))
 
-    net = chain(
-      (freeze(4), max_pool()),
-      (freeze(16), max_pool()),
-      (freeze(16), max_pool()),
-      (freeze(6), max_pool()),
-      freeze(12),
+
+    net = unet(
+      [downblock(n) for n in (32, 64, 128)],
+      [upblock(n) for n in (32, 64, 128)[::-1]]
     )(test_input)
 
     draw_to_file(layers.get_all_layers(net), 'test_net.png')

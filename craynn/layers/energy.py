@@ -51,7 +51,7 @@ class Energy2DLayer(layers.MergeLayer):
 
   def get_output_shape_for(self, input_shapes):
     match = lambda shape1, shape2: all([ s2 == s2 for s1, s2 in  zip(shape1, shape2)])
-    assert len(input_shapes) == 2, 'This layer can only have 2 incoming layers!'
+    assert len(input_shapes) == 2, 'This layer can have only 2 incoming layers!'
     assert match(input_shapes[0], input_shapes[1]), 'Shapes of input layers must match!'
 
     return input_shapes[0][:1]

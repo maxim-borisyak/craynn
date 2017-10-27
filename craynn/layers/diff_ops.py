@@ -12,6 +12,9 @@ __all__ = [
 from .conv_ops import get_conv_nonlinearity
 
 class Diffusion2DLayer(layers.Conv2DLayer):
+  """
+  Just convolution layer with pad='same'.
+  """
   def __init__(self, incoming, num_filters, filter_size,
                untie_biases=False,
                W=init.GlorotUniform(1.0),
