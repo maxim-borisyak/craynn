@@ -19,7 +19,6 @@ def _unet(incoming, down_ops, up_ops, concat=concat()):
   net = op(net)
 
   for down_layer, op in zip(down_chain[:-1][::-1], up_ops[1:]):
-    print('Concat %s %s with %s %s' % (down_layer, layers.get_output_shape(down_layer), net, layers.get_output_shape(net)))
     net = op(concat([net, down_layer]))
 
   return net

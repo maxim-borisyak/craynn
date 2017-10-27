@@ -11,8 +11,11 @@ __all__ = [
   'get_input_layer'
 ]
 
+def is_shape(shape_or_layer):
+  return hasattr(shape_or_layer, '__iter__') and all([ (type(s) is int or s is None) for s in shape_or_layer ])
+
 def get_input_layer(shape_or_layer, index=None):
-  if hasattr(shape_or_layer, '__iter__') and all([ type(s) is int for s in shape_or_layer ]):
+  if is_shape(shape_or_layer) :
     name = 'input' if index is None else 'input%d' % index
     return layers.InputLayer(shape=shape_or_layer, name=name)
   else:
@@ -22,7 +25,7 @@ def get_input_layer(shape_or_layer, index=None):
 class Net(Expression):
   def __init__(self, factory, inputs):
     ### either single layer instance or one shape
-    if not hasattr(inputs, '__iter__') or all([ type(s) is int for s in inputs ]):
+    if not hasattr(inputs, '__iter__') or is_shape(inputs):
       input_layer = get_input_layer(inputs)
       outputs = factory(input_layer)
       input_layers = [input_layer]
