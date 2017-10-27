@@ -24,7 +24,7 @@ class TestChains(unittest.TestCase):
     nn = net((None, 1, 256, 256))(factory)
     print(nn.inputs)
     print(nn.outputs)
-    print()
+    print(nn.description())
 
     draw_to_file(layers.get_all_layers(nn.outputs), 'test_net.png')
 

@@ -248,10 +248,14 @@ class Expression(ExpressionBase):
     def describe_layer(l):
       return '%s\n  output shape:%s\n  number of params: %s' % (l, l.output_shape, get_number_of_params(l))
 
-    return '%s\n%s' % (
-      str(self),
-      '\n'.join([describe_layer(l) for l in layers.get_all_layers(self.outputs)])
+    summary = '%s -> %s\ntotal number of params: %d' % (
+      ' x '.join([ str(layers.get_output_shape(input)) for input in  self.inputs ]),
+      ' x '.join([ str(layers.get_output_shape(output)) for output in self.outputs]),
+      int(np.sum([ get_number_of_params(l) for l in layers.get_all_layers(self.outputs) ]))
     )
+    layer_wise = '\n'.join([describe_layer(l) for l in layers.get_all_layers(self.outputs)])
+
+    return '%s\n===========\n%s\n==========\n%s' % (str(self), summary, layer_wise)
 
   def params(self, **tags):
     return layers.get_all_params(self.outputs, **tags)
