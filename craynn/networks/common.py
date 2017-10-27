@@ -19,11 +19,16 @@ def get_input_layer(shape_or_layer, index=None):
 
 class Net(Expression):
   def __init__(self, factory, inputs):
-    input_layers = []
-    for i, input in enumerate(inputs):
-      input_layers.append(get_input_layer(input, i))
-
-    outputs = factory(input_layers)
+    if not hasattr(inputs, '__iter__'):
+      input_layer = get_input_layer(inputs)
+      outputs = factory(input_layer)
+      input_layers = [input_layer]
+    else:
+      input_layers = [
+        get_input_layer(input, i)
+        for i, input in enumerate(inputs)
+      ]
+      outputs = factory(input_layers)
 
     if not hasattr(outputs, '__iter__'):
       outputs = [outputs]
@@ -31,4 +36,4 @@ class Net(Expression):
     super(Net, self).__init__(input_layers, outputs)
 
 
-net = lambda *inputs: lambda *factory: Net(achain(*factory), inputs)
+net = lambda inputs: lambda *factory: Net(achain(*factory), inputs)
