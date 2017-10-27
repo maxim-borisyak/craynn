@@ -4,6 +4,8 @@ from craynn import Expression
 
 from ..subnetworks import achain
 
+
+
 __all__ = [
   'Net', 'net',
   'get_input_layer'
@@ -19,7 +21,8 @@ def get_input_layer(shape_or_layer, index=None):
 
 class Net(Expression):
   def __init__(self, factory, inputs):
-    if not hasattr(inputs, '__iter__'):
+    ### either single layer instance or one shape
+    if not hasattr(inputs, '__iter__') or all([ type(s) is int for s in inputs ]):
       input_layer = get_input_layer(inputs)
       outputs = factory(input_layer)
       input_layers = [input_layer]
