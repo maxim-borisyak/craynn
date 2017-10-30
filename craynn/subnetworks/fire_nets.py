@@ -11,14 +11,14 @@ def make_fire_module(
   n_filters = 64,
   squeeze=clayers.squeeze,
   expand=(clayers.diff, clayers.diff1x1),
-  merge=clayers.concat
+  merge=clayers.concat()
 ):
 
   net = squeeze(n_filters // 4)(incoming)
   expanded = [ exp(n_filters)(net) for exp in expand ]
-  return merge()(expanded)
+  return merge(expanded)
 
-fire_module = lambda n_filters, squeeze=clayers.squeeze, expand=(clayers.diff, clayers.diff1x1), merge=clayers.concat: lambda incoming: \
+fire_module = lambda n_filters, squeeze=clayers.squeeze, expand=(clayers.diff, clayers.diff1x1), merge=clayers.concat(): lambda incoming: \
   make_fire_module(incoming, n_filters, squeeze, expand, merge)
 
 fire = lambda n_filters: lambda incoming: \

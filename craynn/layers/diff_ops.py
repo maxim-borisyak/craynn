@@ -5,7 +5,7 @@ __all__ = [
   'Diffusion2DLayer',
   'ChannelPooling2DLayer',
   'diff', 'diff1x1',
-  'channel_pool', 'channel_rpool'
+  'channel_pool', 'channel_factor_pool'
 ]
 
 from .conv_ops import get_conv_nonlinearity
@@ -36,6 +36,8 @@ diff = lambda num_filters, f=None: lambda incoming: Diffusion2DLayer(
   filter_size=(3, 3),
   nonlinearity=get_conv_nonlinearity(f),
 )
+
+double_diff = lambda num_filters, f=None: lambda incoming: diff(num_filters, f)(diff(num_filters, f)(incoming))
 
 diff1x1 = lambda num_filters, f=None: lambda incoming: Diffusion2DLayer(
   incoming=incoming,
@@ -69,7 +71,7 @@ channel_pool = lambda num_filters: lambda incoming: ChannelPooling2DLayer(
   nonlinearity=nonlinearities.linear,
 )
 
-channel_rpool = lambda channel_factor=2: lambda incoming: ChannelPooling2DLayer(
+channel_factor_pool = lambda channel_factor=2: lambda incoming: ChannelPooling2DLayer(
   incoming=incoming,
   num_filters=layers.get_output_shape(incoming)[1] // channel_factor,
   nonlinearity=nonlinearities.linear,

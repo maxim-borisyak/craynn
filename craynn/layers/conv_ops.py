@@ -5,6 +5,7 @@ __all__ = [
   'deconv', 'deconv1x1',
   'upscale',
   'max_pool', 'mean_pool', 'floating_maxpool', 'floating_meanpool',
+  'global_pool',
   'upconv', 'downconv'
 ]
 

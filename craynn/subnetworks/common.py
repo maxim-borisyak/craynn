@@ -4,18 +4,20 @@ from ..layers import channel_pool
 __all__ = [
   'adjust_channels',
   'get_kernels_by_type',
-  'chain', 'achain'
+  'chain', 'achain', 'repeat'
 ]
 
-def get_kernels_by_type(net, kernel_type):
+def get_kernels_by_type(layer, kernel_type):
   kernels = []
 
-  for l in layers.get_all_layers(net):
-    try:
-      W = getattr(l, kernel_type)()
-      kernels.append(W)
-    except:
-      pass
+  for l in layers.get_all_layers(layer):
+    kernel_getter = getattr(l, kernel_type + '_kernel', None)
+    if kernel_getter is not None:
+      W = kernel_getter()
+      if hasattr(W, '__iter__'):
+        kernels.extend(W)
+      else:
+        kernels.append(W)
 
   return kernels
 
@@ -67,3 +69,7 @@ def _achain(incoming, definition):
   return net
 
 achain = lambda *definition: lambda incoming: _achain(incoming, definition)
+
+repeat = lambda n: lambda *definition: lambda incoming: achain(
+  (achain(*definition), ) * n
+)

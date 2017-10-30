@@ -1,30 +1,46 @@
 import theano.tensor as T
-from lasagne import *
 
+from ..layers import *
 from ..layers.conv_ops import get_companion_nonlinearity
 
+from .common import repeat
+
 __all__ = [
+  'conv_block', 'double_conv',
+  'diff_block', 'double_diff',
   'companion', 'max_companion', 'mean_companion'
 ]
 
-def _conv_companion(layer, pool_function=T.max, n_units=None, nonlinearity=None):
-  net = layers.GlobalPoolLayer(layer, pool_function=pool_function)
+conv_block = lambda n, num_filters, f=None: repeat(n)(
+  conv(num_filters, f)
+)
 
-  if n_units is None:
-    nonlinearity = get_companion_nonlinearity(n_units, nonlinearity)
-    net = layers.DenseLayer(net, num_units=1, nonlinearity=nonlinearity)
-    net = layers.FlattenLayer(net, outdim=1)
+double_conv = lambda num_filters, f=None: conv_block(2, num_filters, f)
+
+def _conv_companion(incoming, num_units=None, global_pool_op=global_pool(T.max), dense=dense, f=None):
+  net = global_pool_op(incoming)
+
+  if num_units is None:
+    f = get_companion_nonlinearity(num_units, f)
+    net = dense(num_units=1, f=f)(net)
+    net = flatten(outdim=1)(net)
   else:
-    nonlinearity = get_companion_nonlinearity(n_units, nonlinearity)
-    net = layers.DenseLayer(net, num_units=n_units, nonlinearity=nonlinearity)
+    f = get_companion_nonlinearity(num_units, f)
+    net = dense(net, f=f)
 
   return net
 
-companion = lambda n_units=None, pool=T.max, f=None: lambda incoming: \
-  _conv_companion(incoming, pool_function=pool, n_units=n_units, nonlinearity=f)
+companion = lambda n_units=None, global_pool_op=global_pool(T.max), f=None, dense=dense: lambda incoming: \
+  _conv_companion(incoming, global_pool_op=global_pool_op, num_units=n_units, f=f, dense=dense)
 
-max_companion = lambda n_units=None, f=None: lambda incoming: \
-  _conv_companion(incoming, n_units=n_units, pool_function=T.max, nonlinearity=f)
+max_companion = lambda n_units=None, global_pool_op=global_pool(T.max), f=None, dense=dense: lambda incoming: \
+  _conv_companion(incoming, global_pool_op=global_pool_op, num_units=n_units, f=f, dense=dense)
 
-mean_companion = lambda n_units=None, f=None: lambda incoming: \
-  _conv_companion(incoming, n_units=n_units, pool_function=T.mean, nonlinearity=f)
+mean_companion = lambda n_units=None, global_pool_op=global_pool(T.mean), f=None, dense=dense: lambda incoming: \
+  _conv_companion(incoming, global_pool_op=global_pool_op, num_units=n_units, f=f, dense=dense)
+
+diff_block = lambda n, num_filters, f=None: repeat(n)(
+  diff(num_filters, f)
+)
+
+double_diff = lambda num_filters, f=None: diff_block(2, num_filters, f)
