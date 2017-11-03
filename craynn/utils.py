@@ -112,7 +112,7 @@ def border_mask(exclude_borders, img_shape, dtype='float32'):
   mask[:, :n] = 0
   mask[:, -n:] = 0
 
-  return theano.shared(mask, name='border_excluding_mask')
+  return mask
 
 def masked(exclude_borders, img_shape, dtype='float32'):
   if exclude_borders > 0:
