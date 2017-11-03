@@ -17,3 +17,4 @@ from .scale import *
 from .prop_nets import *
 from .unet import *
 from .column import *
+from .energy_based import *
