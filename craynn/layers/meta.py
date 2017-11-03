@@ -37,7 +37,11 @@ class CloneLayer(Layer):
   """
   def __init__(self, incoming, original):
     self.original = original
-    name = ('clone of %s' % original.name) if original.name is not None else None
+    if original.name is None:
+      name = 'clone of %s' % type(original).__name__
+    else:
+      name = 'clone of %s' % original.name
+
     super(CloneLayer, self).__init__(incoming, name=name)
 
   def get_params(self, unwrap_shared=True, **tags):
