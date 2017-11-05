@@ -11,8 +11,8 @@ __all__ = [
 
 get_conv_nonlinearity = lambda f=None: nonlinearities.LeakyRectify(0.05) if f is None else f
 
-get_companion_nonlinearity = lambda n_units=None, f=None: \
-  nonlinearities.sigmoid if n_units is None or n_units == 1 else nonlinearities.softmax
+get_companion_nonlinearity = lambda num_units=None, f=None: \
+  nonlinearities.sigmoid if num_units is None or num_units == 1 else nonlinearities.softmax
 
 conv = lambda num_filters, f=None: lambda incoming: layers.Conv2DLayer(
   incoming,

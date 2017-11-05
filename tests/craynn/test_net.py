@@ -10,8 +10,8 @@ from craynn.viz import draw_to_file
 class TestChains(unittest.TestCase):
   def test_import(self):
 
-    downblock = lambda n_filters: achain(diff(n_filters), max_pool())
-    upblock = lambda n_filters: achain(upconv(), diff(n_filters))
+    downblock = lambda num_filters: achain(diff(num_filters), max_pool())
+    upblock = lambda num_filters: achain(upconv(), diff(num_filters))
 
 
     nn = UNet((None, 1, 256, 256))(

@@ -10,9 +10,9 @@ from lasagne import *
 
 class TestResnet(unittest.TestCase):
   def test_net(self):
-    block = lambda n_filters: achain(
-      channel_pool(n_filters),
-      bottleneck_res_block(n_filters)
+    block = lambda num_filters: achain(
+      channel_pool(num_filters),
+      bottleneck_res_block(num_filters)
     )
 
     nn = net((None, 1, 128, 128))(

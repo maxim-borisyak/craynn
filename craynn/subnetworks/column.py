@@ -13,10 +13,10 @@ def _column_module(incoming, ops, factor_pool_op=channel_factor_pool(2), concat_
 column_module = lambda ops, factor_pool_op=channel_factor_pool(2), concat_op=concat(): lambda incoming: \
   _column_module(incoming, ops, factor_pool_op, concat_op)
 
-column = lambda n_filters, depth, conv=conv, factor_pool=channel_factor_pool: lambda incoming: \
+column = lambda num_filters, depth, conv=conv, factor_pool=channel_factor_pool: lambda incoming: \
   _column_module(
     incoming,
-    [ conv(n_filters // depth) for _ in range(depth) ],
+    [conv(num_filters // depth) for _ in range(depth)],
     channel_factor_pool(depth),
     concat()
   )

@@ -10,12 +10,13 @@ from lasagne import *
 
 class TestResnet(unittest.TestCase):
   def test_net(self):
-    block = lambda n_filters: maxdropout2d(n_filters)
+    block = lambda num_filters: maxdropout2d(num_filters)
 
     nn = net((None, 1, 128, 128))(
       block(32), max_pool(),
       block(64), max_pool(),
       block(128), max_pool(),
+      companion(num_units=10)
     )
 
     print(

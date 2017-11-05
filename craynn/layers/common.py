@@ -3,7 +3,7 @@ from lasagne import layers, nonlinearities
 import theano.tensor as T
 
 __all__ = [
-  'take', 'minimum', 'maximum', 'concat', 'noise', 'nothing', 'dropout', 'dense',
+  'take', 'minimum', 'maximum', 'concat', 'noise', 'nothing', 'dropout', 'dense', 'select',
   'batch_norm', 'elementwise', 'elementwise_sum', 'flatten', 'feature_pool', 'nonlinearity'
 ]
 
@@ -24,11 +24,12 @@ dropout = lambda p=0.1, rescale=True: lambda incoming: \
 
 batch_norm = lambda axes='auto': lambda incoming: layers.BatchNormLayer(incoming, axes=axes)
 
-class Take(object):
+class Select(object):
   def __getitem__(self, item):
     return lambda incomings: incomings[item]
 
-take = Take()
+select = Select()
+take = select
 
 elementwise = lambda f=T.add: lambda incomings: layers.ElemwiseMergeLayer(incomings, f)
 elementwise_sum = lambda: lambda incomings: layers.ElemwiseMergeLayer(incomings, T.add)

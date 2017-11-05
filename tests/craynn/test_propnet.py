@@ -12,8 +12,8 @@ class TestPropNet(unittest.TestCase):
   def test_import(self):
     test_input = layers.InputLayer(shape=(None, 1, 28, 28))
 
-    block = lambda n_filters, depth: \
-      downprop([ diff(n_filters) for _ in range(depth) ])
+    block = lambda num_filters, depth: \
+      downprop([diff(num_filters) for _ in range(depth)])
 
     outputs = achain(
       block(4, 3), take[0], max_pool(),
@@ -26,7 +26,6 @@ class TestPropNet(unittest.TestCase):
     )
 
     draw_to_file(layers.get_all_layers(outputs), 'test.png')
-    raise Exception()
 
 
 

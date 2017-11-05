@@ -26,18 +26,18 @@ def _conv_companion(incoming, num_units=None, global_pool_op=global_pool(T.max),
     net = flatten(outdim=1)(net)
   else:
     f = get_companion_nonlinearity(num_units, f)
-    net = dense(net, f=f)
+    net = dense(num_units=num_units, f=f)(net)
 
   return net
 
-companion = lambda n_units=None, global_pool_op=global_pool(T.max), f=None, dense=dense: lambda incoming: \
-  _conv_companion(incoming, global_pool_op=global_pool_op, num_units=n_units, f=f, dense=dense)
+companion = lambda num_units=None, global_pool_op=global_pool(T.max), f=None, dense=dense: lambda incoming: \
+  _conv_companion(incoming, global_pool_op=global_pool_op, num_units=num_units, f=f, dense=dense)
 
-max_companion = lambda n_units=None, global_pool_op=global_pool(T.max), f=None, dense=dense: lambda incoming: \
-  _conv_companion(incoming, global_pool_op=global_pool_op, num_units=n_units, f=f, dense=dense)
+max_companion = lambda num_units=None, global_pool_op=global_pool(T.max), f=None, dense=dense: lambda incoming: \
+  _conv_companion(incoming, global_pool_op=global_pool_op, num_units=num_units, f=f, dense=dense)
 
-mean_companion = lambda n_units=None, global_pool_op=global_pool(T.mean), f=None, dense=dense: lambda incoming: \
-  _conv_companion(incoming, global_pool_op=global_pool_op, num_units=n_units, f=f, dense=dense)
+mean_companion = lambda num_units=None, global_pool_op=global_pool(T.mean), f=None, dense=dense: lambda incoming: \
+  _conv_companion(incoming, global_pool_op=global_pool_op, num_units=num_units, f=f, dense=dense)
 
 diff_block = lambda n, num_filters, f=None: repeat(n)(
   diff(num_filters, f)
