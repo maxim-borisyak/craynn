@@ -10,13 +10,13 @@ __all__ = [
 
 def _maxout(incoming, conv_op, pool_size=5, f=None):
   f = get_conv_nonlinearity(f)
-  return elementwise(f)(
+  return nonlinearity(f)(
     feature_pool(pool_size, f=T.max)(conv_op(incoming))
   )
 
 def _maxdropout(incoming, conv_op, pool_size=5, p=None, f=None):
   f = get_conv_nonlinearity(f)
-  return elementwise(f)(
+  return nonlinearity(f)(
     feature_pool(pool_size, f=T.max)(
       dropout(p=p, rescale=False)(
         conv_op(incoming)
