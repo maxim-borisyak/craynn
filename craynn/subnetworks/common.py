@@ -70,6 +70,6 @@ def _achain(incoming, definition):
 
 achain = lambda *definition: lambda incoming: _achain(incoming, definition)
 
-repeat = lambda n: lambda *definition: lambda incoming: achain(
+repeat = lambda n: lambda *definition: achain(
   (achain(*definition), ) * n
 )
