@@ -4,7 +4,8 @@ import theano.tensor as T
 
 __all__ = [
   'take', 'minimum', 'maximum', 'concat', 'noise', 'nothing', 'dropout', 'dense', 'select',
-  'batch_norm', 'elementwise', 'elementwise_sum', 'flatten', 'feature_pool', 'nonlinearity'
+  'batch_norm', 'elementwise', 'elementwise_sum', 'elementwise_mean',
+  'flatten', 'feature_pool', 'nonlinearity'
 ]
 
 minimum = lambda: lambda incomings: layers.ElemwiseMergeLayer(incomings, merge_function=T.minimum)
@@ -31,11 +32,12 @@ class Select(object):
 select = Select()
 take = select
 
-elementwise = lambda f=T.add: lambda incomings: layers.ElemwiseMergeLayer(incomings, f)
-elementwise_sum = lambda: lambda incomings: layers.ElemwiseMergeLayer(incomings, T.add)
-
 nonlinearity = lambda f=None: lambda incoming: layers.NonlinearityLayer(incoming, (nonlinearities.LeakyRectify(0.05) if f is None else f))
 
+elementwise = lambda f=T.add: lambda incomings: layers.ElemwiseMergeLayer(incomings, f)
+elementwise_sum = lambda: lambda incomings: layers.ElemwiseMergeLayer(incomings, T.add)
+elementwise_mean = lambda: lambda incomings: \
+  nonlinearity(f=lambda x: x / len(incomings))(layers.ElemwiseMergeLayer(incomings, T.add))
 
 
 flatten = lambda outdim=2: lambda incoming: layers.FlattenLayer(incoming, outdim=outdim)
