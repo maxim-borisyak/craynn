@@ -19,11 +19,14 @@ class TestResnet(unittest.TestCase):
       block(32), max_pool(),
       block(64), max_pool(),
       block(128), max_pool(),
+      companion(num_units=10)
     )
 
     print(
       layers.get_output_shape(nn.outputs)
     )
+
+    print(nn.total_number_of_parameters())
 
     draw_to_file(layers.get_all_layers(nn.outputs), 'test.png')
 
