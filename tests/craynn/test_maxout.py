@@ -23,6 +23,8 @@ class TestResnet(unittest.TestCase):
       layers.get_output_shape(nn.outputs)
     )
 
+    print(nn.total_number_of_parameters())
+
     draw_to_file(layers.get_all_layers(nn.outputs), 'test.png')
 
 
