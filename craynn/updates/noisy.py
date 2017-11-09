@@ -44,7 +44,8 @@ def noisy(updates, std=1.0e-3, srng_or_seed=None):
 
     noisy_updates = OrderedDict()
 
-    for param, new_param in upd:
+    for param in upd:
+      new_param = upd[param]
       noisy_updates[param] = new_param + srng.normal(size=param.shape, ndim=param.ndim, std=std)
 
     return noisy_updates
