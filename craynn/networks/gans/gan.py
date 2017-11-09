@@ -15,7 +15,7 @@ class GAN(object):
     """
     Provides GAN model.
     :param loss: loss functions (scores real, scores pseudo), must return two expressions
-      loss for discriminator training and generator loss for **minimization** .
+      loss for discriminator training and generator loss, both for **minimization** .
     :param discriminator: a `craynn.Expression` should return collection with one value.
     :param generator: a `craynn.Expression` should return collection with one value.
     """
