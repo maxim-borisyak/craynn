@@ -91,18 +91,16 @@ class NoisyDiff2DLayer(NoisyConv2DLayer):
                                            convolution, seed,
                                            **kwargs)
 
-noisy_diff = lambda num_filters, f=None, noise_std=1.0e-2: lambda incoming: NoisyConv2DLayer(
+noisy_diff = lambda num_filters, f=None, noise_std=1.0e-2: lambda incoming: NoisyDiff2DLayer(
   incoming,
   num_filters=num_filters, filter_size=(3, 3),
   noise_std=noise_std,
   nonlinearity=get_conv_nonlinearity(f),
-  pad='valid'
 )
 
-noisy_diff1x1 = lambda num_filters, f=None, noise_std=1.0e-2: lambda incoming: NoisyConv2DLayer(
+noisy_diff1x1 = lambda num_filters, f=None, noise_std=1.0e-2: lambda incoming: NoisyDiff2DLayer(
   incoming,
   num_filters=num_filters, filter_size=(1, 1),
   noise_std=noise_std,
   nonlinearity=get_conv_nonlinearity(f),
-  pad='valid'
 )
