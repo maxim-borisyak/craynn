@@ -7,16 +7,16 @@ from craynn.networks import *
 
 from craynn.viz import draw_to_file
 
-class TestChains(unittest.TestCase):
-  def test_import(self):
+class TestEBNet(unittest.TestCase):
+  def test_energy_based(self):
 
-    downblock = lambda num_filters: achain(diff(num_filters), max_pool())
-    upblock = lambda num_filters: achain(upconv(), diff(num_filters))
-
-
-    nn = UNet((None, 1, 256, 256))(
-      [downblock(n) for n in (32, 64, 128)],
-      [upblock(n) for n in (32, 64, 128)[::-1]]
+    nn = EnergyBased((None, 1, 38, 38))(mask(9), mask(9)) (
+      conv(16), max_pool(),
+      conv(32), max_pool(),
+      conv(64),
+      deconv(32), upscale(),
+      deconv(16), upscale(),
+      deconv(1),
     )
 
     print(nn.inputs)

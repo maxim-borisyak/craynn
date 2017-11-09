@@ -12,6 +12,12 @@ __all__ = [
   'get_input_layer'
 ]
 
+def get_number_of_params(layer):
+  return np.sum([
+    np.prod(param.get_value(borrow=True).shape)
+    for param in layer.get_params()
+  ])
+
 class Expression(object):
   def __init__(self, inputs, outputs, *args, **kwargs):
     """
@@ -106,12 +112,6 @@ class Expression(object):
     return regularization.regularize_network_params(self.outputs, penalty=regularization.l2)
 
   def description(self):
-    def get_number_of_params(l):
-      return np.sum([
-        np.prod(param.get_value().shape)
-        for param in l.get_params()
-      ])
-
     def describe_layer(l):
       return '%s\n  output shape:%s\n  number of params: %s' % (l, l.output_shape, get_number_of_params(l))
 
@@ -123,6 +123,9 @@ class Expression(object):
     layer_wise = '\n'.join([describe_layer(l) for l in layers.get_all_layers(self.outputs)])
 
     return '%s\n===========\n%s\n==========\n%s' % (str(self), summary, layer_wise)
+
+  def total_number_of_parameters(self):
+    return int(np.sum([get_number_of_params(l) for l in layers.get_all_layers(self.outputs)]))
 
   def params(self, **tags):
     return layers.get_all_params(self.outputs, **tags)
@@ -163,8 +166,20 @@ class Net(Expression):
 
 """
 Allows nice syntax:
-  net(input1, input2, ...)(
+```
+  net([input1, input2, ...])(
     constructor
   )
+```
+
+or 
+
+```
+  net(input)(
+    constructor
+  )
+```
+
+for single input.
 """
 net = lambda inputs: lambda *factory: Net(achain(*factory), inputs)

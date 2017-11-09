@@ -11,12 +11,12 @@ __all__ = [
 
 get_conv_nonlinearity = lambda f=None: nonlinearities.LeakyRectify(0.05) if f is None else f
 
-get_companion_nonlinearity = lambda n_units=None, f=None: \
-  nonlinearities.sigmoid if n_units is None or n_units == 1 else nonlinearities.softmax
+get_companion_nonlinearity = lambda num_units=None, f=None: \
+  nonlinearities.sigmoid if num_units is None or num_units == 1 else nonlinearities.softmax
 
-conv = lambda num_filters, f=None: lambda incoming: layers.Conv2DLayer(
+conv = lambda num_filters, f=None, filter_size=(3, 3): lambda incoming: layers.Conv2DLayer(
   incoming,
-  num_filters=num_filters, filter_size=(3, 3),
+  num_filters=num_filters, filter_size=filter_size,
   nonlinearity=get_conv_nonlinearity(f),
   pad='valid'
 )
@@ -28,9 +28,9 @@ conv1x1 = lambda num_filters, f=None: lambda incoming: layers.Conv2DLayer(
   pad='valid'
 )
 
-deconv = lambda num_filters, f=None: lambda incoming: layers.TransposedConv2DLayer(
+deconv = lambda num_filters, f=None, filter_size=(3, 3): lambda incoming: layers.TransposedConv2DLayer(
   incoming,
-  num_filters=num_filters, filter_size=(3, 3),
+  num_filters=num_filters, filter_size=filter_size,
   nonlinearity=get_conv_nonlinearity(f),
   crop='valid'
 )

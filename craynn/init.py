@@ -32,10 +32,10 @@ class Diffusion(Initializer, InitializerWithSum):
     id_conv[cx, cy] = 1.0 / shape[0] * shape[1]
 
     s = np.zeros(shape=shape)
-    n_filters = shape[0]
+    num_filters = shape[0]
     n_channels = shape[1]
 
-    for i in range(n_filters):
+    for i in range(num_filters):
       s[i, ((i + self.offset) % n_channels)] = id_conv
 
     return floatX(s * self.gain)

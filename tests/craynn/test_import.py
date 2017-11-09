@@ -22,7 +22,7 @@ class ImportTest(unittest.TestCase):
     test_input = layers.InputLayer(shape=(None, 1, 28, 28))
     random_input = GaussianInput(shape_or_layer=test_input)
 
-    nn = net(test_input, random_input)(
+    nn = net([test_input, random_input])(
       [
         (lambda inputs: inputs[0], conv(8), conv(16)),
         (lambda inputs: inputs[1], conv(23), conv(16)),

@@ -15,5 +15,7 @@ from .common import *
 from .fire_nets import *
 from .scale import *
 from .prop_nets import *
-from .unet import *
-from .column import *
+from .u_nets import *
+from .column_nets import *
+from .energy_based import *
+from .maxout_nets import *

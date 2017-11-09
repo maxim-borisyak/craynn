@@ -30,14 +30,15 @@ class Diffusion2DLayer(layers.Conv2DLayer):
   def diffusion_kernel(self):
     return self.W
 
-diff = lambda num_filters, f=None: lambda incoming: Diffusion2DLayer(
+diff = lambda num_filters, f=None, filter_size=(3, 3): lambda incoming: Diffusion2DLayer(
   incoming=incoming,
   num_filters=num_filters,
-  filter_size=(3, 3),
+  filter_size=filter_size,
   nonlinearity=get_conv_nonlinearity(f),
 )
 
-double_diff = lambda num_filters, f=None: lambda incoming: diff(num_filters, f)(diff(num_filters, f)(incoming))
+double_diff = lambda num_filters, f=None, filter_size=(3, 3): lambda incoming: \
+  diff(num_filters, f, filter_size=filter_size)(diff(num_filters, f, filter_size=filter_size)(incoming))
 
 diff1x1 = lambda num_filters, f=None: lambda incoming: Diffusion2DLayer(
   incoming=incoming,
