@@ -5,6 +5,8 @@ from lasagne.updates import get_or_compute_grads
 
 from theano.sandbox.rng_mrg import MRG_RandomStreams
 
+from collections import OrderedDict
+
 __all__ = [
   'noisy_gradients',
   'noisy'
@@ -22,7 +24,7 @@ def noisy(updates, std=1.0e-3, srng_or_seed=None):
   ```
 
   :param updates: a function that receive list of gradients and list of network parameters
-    as first two arguments. All optimizers from `lasagne.updates` has such form.
+    as first two arguments and returns update dictionary. All optimizers from `lasagne.updates` has such form.
 
   :param std: scalar, standard deviation for gradient noise.
   :param srng_or_seed: theano random stream instance or integer or None.
@@ -31,8 +33,6 @@ def noisy(updates, std=1.0e-3, srng_or_seed=None):
   :return: modified update function.
   """
   def u(loss_or_grads, params, *args, **kwargs):
-    grads = get_or_compute_grads(loss_or_grads, params)
-
     if type(srng_or_seed) is int:
       srng = MRG_RandomStreams(srng_or_seed)
     elif srng_or_seed is None:
@@ -40,9 +40,14 @@ def noisy(updates, std=1.0e-3, srng_or_seed=None):
     else:
       srng = srng_or_seed
 
-    noisy_grads = [ g + srng.normal(size=g.shape, ndim=g.ndim, std=std) for g in grads ]
+    upd = updates(loss_or_grads, params, *args, **kwargs)
 
-    return updates(noisy_grads, params, *args, **kwargs)
+    noisy_updates = OrderedDict()
+
+    for param, new_param in upd:
+      noisy_updates[param] = new_param + srng.normal(size=param.shape, ndim=param.ndim, std=std)
+
+    return noisy_updates
 
   return u
 
