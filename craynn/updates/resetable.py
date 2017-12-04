@@ -13,7 +13,7 @@ from lasagne.updates import get_or_compute_grads
 from collections import OrderedDict
 
 def adamax(loss_or_grads, params, learning_rate=0.002, beta1=0.9,
-           beta2=0.999, epsilon=1e-8, scale_factor=None):
+           beta2=0.95, epsilon=1e-8, scale_factor=None):
   """
   This version returns additional update to scale momentum params by the factor of `scale_factor`.
   Intended to be used for inner optimization in max-min problems.
@@ -86,11 +86,7 @@ def adamax(loss_or_grads, params, learning_rate=0.002, beta1=0.9,
       if scale_factor is not None else
       T.zeros(value.shape, value.dtype)
     )
-    resets[u_prev] = (
-      u_prev * scale_factor
-      if scale_factor is not None else
-      T.zeros(value.shape, value.dtype)
-    )
+    ### no need to reset second momentum.
 
   updates[t_prev] = t
 

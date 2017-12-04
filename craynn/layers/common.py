@@ -39,7 +39,6 @@ elementwise_sum = lambda: lambda incomings: layers.ElemwiseMergeLayer(incomings,
 elementwise_mean = lambda: lambda incomings: \
   nonlinearity(f=lambda x: x / len(incomings))(layers.ElemwiseMergeLayer(incomings, T.add))
 
-
 flatten = lambda outdim=2: lambda incoming: layers.FlattenLayer(incoming, outdim=outdim)
 
 feature_pool = lambda pool_size=4, axis=1, f=T.max: lambda incoming: \
