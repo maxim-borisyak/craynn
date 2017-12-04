@@ -86,11 +86,6 @@ def adamax(loss_or_grads, params, learning_rate=0.002, beta1=0.9,
       if scale_factor is not None else
       T.zeros(value.shape, value.dtype)
     )
-    resets[u_prev] = (
-      u_prev * scale_factor
-      if scale_factor is not None else
-      T.zeros(value.shape, value.dtype)
-    )
 
   updates[t_prev] = t
 
