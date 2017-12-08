@@ -8,6 +8,8 @@ __all__ = [
   'flatten', 'feature_pool', 'nonlinearity'
 ]
 
+get_common_nonlinearity = lambda f=None: nonlinearities.LeakyRectify(0.1) if f is None else f
+
 minimum = lambda: lambda incomings: layers.ElemwiseMergeLayer(incomings, merge_function=T.minimum)
 maximum = lambda: lambda incomings: layers.ElemwiseMergeLayer(incomings, merge_function=T.maximum)
 concat = lambda axis=1: lambda incomings: layers.ConcatLayer(incomings, axis=axis)
