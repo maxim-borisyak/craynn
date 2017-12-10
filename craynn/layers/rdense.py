@@ -9,7 +9,7 @@ from lasagne import nonlinearities
 from .common import get_common_nonlinearity
 
 __all__ = [
-  'RestrictedDense',
+  'RestrictedDenseLayer',
   'rdense'
 ]
 
