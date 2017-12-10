@@ -60,6 +60,6 @@ class RestrictedDenseLayer(lasagne.layers.DenseLayer):
 rdense = lambda num_units, f=None, normalization='global': lambda incoming: RestrictedDenseLayer(
   incoming=incoming,
   num_units=num_units,
-  f=get_common_nonlinearity(f),
+  nonlinearity=get_common_nonlinearity(f),
   normalization=normalization
 )

@@ -16,7 +16,7 @@ class TestResnet(unittest.TestCase):
       block(32), max_pool(),
       block(64), max_pool(),
       block(128), max_pool(),
-      companion(num_units=10)
+      rdense(10)
     )
 
     print(
