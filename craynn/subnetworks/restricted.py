@@ -3,6 +3,10 @@ import theano.tensor as T
 from .common import get_kernels_by_type
 from ..utils import lsum
 
+__all__ = [
+  'restricted_kernel_stabilizer'
+]
+
 def restricted_kernel_stabilizer(net, C=1.0, type='quadratic'):
   kernels = get_kernels_by_type(net, 'restricted')
 

@@ -7,5 +7,7 @@ from .fire_ops import *
 from .common import *
 from .mask import *
 from .noisy_conv_ops import *
+from .rconv import *
+from .rdense import *
 
 from .meta import *
