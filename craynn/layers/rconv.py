@@ -74,7 +74,7 @@ rconv = lambda num_filters, f=None, filter_size=(3, 3), normalization='global': 
   num_filters=num_filters,
   filter_size=filter_size,
   nonlinearity=get_conv_nonlinearity(f),
-  normalization='global'
+  normalization='unit'
 )
 
 rconv1x1 = lambda num_filters, f=None, normalization='global': lambda incoming: RestrictedConv2DLayer(
@@ -82,5 +82,5 @@ rconv1x1 = lambda num_filters, f=None, normalization='global': lambda incoming: 
   num_filters=num_filters,
   filter_size=(1, 1),
   nonlinearity=get_conv_nonlinearity(f),
-  normalization='global'
+  normalization='unit'
 )
