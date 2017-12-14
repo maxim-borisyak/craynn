@@ -13,15 +13,14 @@ class RestrictedConv2DLayer(layers.Conv2DLayer):
   Just convolution layer with pad='same'.
   """
   def __init__(self, incoming, num_filters, filter_size,
+               stride=(1, 1),
+               pad='valid',
                untie_biases=False,
                W=init.GlorotUniform(1.0),
                b=init.Constant(0.),
                nonlinearity=nonlinearities.LeakyRectify(0.1), flip_filters=True,
                normalization='global', eps=1.0e-6,
                convolution=T.nnet.conv2d, **kwargs):
-    stride = (1, 1)
-    pad = 'same'
-
     self.eps = eps
 
     self.normalization = normalization
