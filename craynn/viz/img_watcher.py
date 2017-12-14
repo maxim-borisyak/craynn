@@ -73,7 +73,7 @@ class SImgWatcher(object):
 
     self.columns = [
       [
-        add_image(i * n_cols + 1, cmap)
+        add_image(i * n_cols + j, cmap)
         for i in range(n_rows)
       ]
       for j in range(n_cols)
