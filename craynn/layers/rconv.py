@@ -19,19 +19,21 @@ class RestrictedConv2DLayer(layers.Conv2DLayer):
                W=init.GlorotUniform(1.0),
                b=init.Constant(0.),
                nonlinearity=nonlinearities.LeakyRectify(0.1), flip_filters=True,
-               normalization='global', eps=1.0e-6,
+               normalization='unit', eps=1.0e-6,
                convolution=T.nnet.conv2d, **kwargs):
     self.eps = eps
 
     self.normalization = normalization
 
-    if normalization not in ['unit', 'global']:
-      raise ValueError("normalization must be one of ['unit', 'global']")
+    if normalization not in ('unit', 'global'):
+      raise ValueError("normalization must be either 'unit' or 'global'")
 
-    super(RestrictedConv2DLayer, self).__init__(incoming, num_filters, filter_size,
-                                           stride, pad, untie_biases, W, b,
-                                           nonlinearity, flip_filters, convolution,
-                                           **kwargs)
+    super(RestrictedConv2DLayer, self).__init__(
+      incoming, num_filters, filter_size,
+      stride, pad, untie_biases, W, b,
+      nonlinearity, flip_filters, convolution,
+      **kwargs
+    )
 
   def restricted_conv_kernel(self):
     return self.W
@@ -46,7 +48,7 @@ class RestrictedConv2DLayer(layers.Conv2DLayer):
 
     if self.normalization == 'global':
       W_norm = T.sqrt(T.sum(self.W ** 2) + self.eps)
-      normalized_W = self.W / W_norm
+      normalized_W = self.num_filters * self.W / W_norm
     elif self.normalization == 'unit':
       W_norm = T.sqrt(T.sum(self.W ** 2, axis=(1, 2, 3)) + self.eps)
       normalized_W = self.W / W_norm[:, None, None, None]
@@ -57,6 +59,14 @@ class RestrictedConv2DLayer(layers.Conv2DLayer):
                               border_mode=border_mode,
                               filter_flip=self.flip_filters)
     return conved
+
+  def stabilizer(self, C=1.0):
+    if self.normalization == 'global':
+      return (T.sqrt(T.sum(self.W ** 2)) - C) ** 2
+    else:
+      return T.sum(
+        (T.sqrt(T.sum(self.W ** 2, axis=(1, 2, 3))) - C)**2
+      )
 
 
 rconv = lambda num_filters, f=None, filter_size=(3, 3), normalization='global': lambda incoming: RestrictedConv2DLayer(
