@@ -64,6 +64,8 @@ class BlockConv2D(layers.Conv2DLayer):
                               filter_flip=self.flip_filters)
     return conved
 
+  def num_params(self):
+    return np.sum(self.M.get_value()) * np.prod(self.filter_size) + (1 if self.untie_biases else self.num_filters)
 
 blockconv = lambda num_filters, f=None, filter_size=(3, 3), connectivity=0.1, connection_type='random': lambda incoming: BlockConv2D(
   incoming=incoming,

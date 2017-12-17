@@ -13,10 +13,13 @@ __all__ = [
 ]
 
 def get_number_of_params(layer):
-  return np.sum([
-    np.prod(param.get_value(borrow=True).shape)
-    for param in layer.get_params()
-  ])
+  try:
+    return layer.num_params()
+  except:
+    return np.sum([
+      np.prod(param.get_value(borrow=True).shape)
+      for param in layer.get_params()
+    ])
 
 class Expression(object):
   def __init__(self, inputs, outputs, *args, **kwargs):
