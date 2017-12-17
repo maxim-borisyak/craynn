@@ -5,7 +5,8 @@ import numpy as np
 
 __all__ = [
   'BlockConv2D',
-  'blockconv', 'blockconv1x1'
+  'blockconv', 'blockconv1x1',
+  'blockdiff', 'blockdiff1x1',
 ]
 
 from .conv_ops import get_conv_nonlinearity
@@ -71,6 +72,7 @@ blockconv = lambda num_filters, f=None, filter_size=(3, 3), connectivity=0.1, co
   incoming=incoming,
   num_filters=num_filters,
   filter_size=filter_size,
+  pad='valid',
   connections_per_filter=connectivity,
   connection_type=connection_type,
   nonlinearity=get_conv_nonlinearity(f),
@@ -80,6 +82,27 @@ blockconv1x1 = lambda num_filters, f=None, connectivity=0.1, connection_type='ra
   incoming=incoming,
   num_filters=num_filters,
   filter_size=(1, 1),
+  pad='valid',
+  connections_per_filter=connectivity,
+  connection_type=connection_type,
+  nonlinearity=get_conv_nonlinearity(f),
+)
+
+blockdiff = lambda num_filters, f=None, filter_size=(3, 3), connectivity=0.1, connection_type='random': lambda incoming: BlockConv2D(
+  incoming=incoming,
+  num_filters=num_filters,
+  filter_size=filter_size,
+  pad='same',
+  connections_per_filter=connectivity,
+  connection_type=connection_type,
+  nonlinearity=get_conv_nonlinearity(f),
+)
+
+blockdiff1x1 = lambda num_filters, f=None, connectivity=0.1, connection_type='random': lambda incoming: BlockConv2D(
+  incoming=incoming,
+  num_filters=num_filters,
+  filter_size=(1, 1),
+  pad='same',
   connections_per_filter=connectivity,
   connection_type=connection_type,
   nonlinearity=get_conv_nonlinearity(f),

@@ -125,3 +125,12 @@ def masked(exclude_borders, img_shape, dtype='float32'):
   else:
     M = None
     return lambda X: X
+
+def onehot(y, n_classes=None):
+  if n_classes is None:
+    n_classes = np.max(y) + 1
+  y_ = np.zeros(shape=(y.shape[0], n_classes), dtype=y.dtype)
+
+  y_[np.arange(y.shape[0]), y] = 1
+
+  return y_

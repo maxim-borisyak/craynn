@@ -19,12 +19,16 @@ class TestConvNet(unittest.TestCase):
       blockconv(12),
       blockconv1x1(12),
       diff(12),
-      diff1x1(12)
+      diff1x1(12),
+      blockdiff(12),
+      blockdiff1x1(12),
     )
 
     print(
       layers.get_output_shape(nn.outputs)
     )
+
+    print(nn.description())
 
     print(nn.total_number_of_parameters())
 
