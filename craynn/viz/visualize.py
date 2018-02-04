@@ -311,7 +311,7 @@ def get_hex_color(layer_type):
     return COLORS[5:10][hashed]
   if layer_type in lasagne.layers.recurrent.__all__:
     return COLORS[10:15][hashed]
-  else:
+  else: 
     return COLORS[15:20][hashed]
 
 

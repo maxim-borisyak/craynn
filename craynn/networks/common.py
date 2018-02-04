@@ -73,12 +73,12 @@ class Expression(object):
 
   def save(self, path):
     import pickle
-    with open(path, 'w') as f:
+    with open(path, 'wb') as f:
       pickle.dump(self.weights, f)
 
   def load(self, path):
     import pickle
-    with open(path, 'r') as f:
+    with open(path, 'rb') as f:
       params = pickle.load(f)
 
     self.weights = params
@@ -133,6 +133,13 @@ class Expression(object):
   def params(self, **tags):
     return layers.get_all_params(self.outputs, **tags)
 
+  @property
+  def layers(self):
+    return layers.get_all_layers(self.outputs)
+
+  def get_all_layers(self):
+    return self.layers()
+
 def is_shape(shape_or_layer):
   return hasattr(shape_or_layer, '__iter__') and all([ (type(s) is int or s is None) for s in shape_or_layer ])
 
@@ -175,7 +182,7 @@ Allows nice syntax:
   )
 ```
 
-or 
+or
 
 ```
   net(input)(

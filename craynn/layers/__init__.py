@@ -9,6 +9,6 @@ from .mask import *
 from .noisy_conv_ops import *
 from .rconv_ops import *
 from .rdense_ops import *
-from .block_conv_ops import *
+from .blockconv_ops import *
 
 from .meta import *
