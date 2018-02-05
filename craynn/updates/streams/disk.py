@@ -2,7 +2,11 @@ import os
 import os.path as osp
 
 import threading
-from queue import Queue
+try:
+  from queue import Queue
+except ImportError as e:
+  from Queue import Queue
+
 
 import numpy as np
 

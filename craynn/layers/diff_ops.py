@@ -5,7 +5,8 @@ __all__ = [
   'Diffusion2DLayer',
   'ChannelPooling2DLayer',
   'diff', 'diff1x1',
-  'channel_pool', 'channel_factor_pool'
+  'channel_pool', 'channel_factor_pool',
+  'diff1D', 'diff1D_1x1'
 ]
 
 from .conv_ops import get_conv_nonlinearity
@@ -76,4 +77,38 @@ channel_factor_pool = lambda channel_factor=2: lambda incoming: ChannelPooling2D
   incoming=incoming,
   num_filters=layers.get_output_shape(incoming)[1] // channel_factor,
   nonlinearity=nonlinearities.linear,
+)
+
+class Diffusion1DLayer(layers.Conv1DLayer):
+  """
+  Just convolution layer with pad='same'.
+  """
+  def __init__(self, incoming, num_filters, filter_size,
+               untie_biases=False,
+               W=init.GlorotUniform(1.0),
+               b=init.Constant(0.),
+               nonlinearity=nonlinearities.LeakyRectify(0.05), flip_filters=True,
+               **kwargs):
+    stride = (1, )
+    pad = 'same'
+    super(Diffusion1DLayer, self).__init__(incoming, num_filters, filter_size,
+                                           stride, pad, untie_biases, W, b,
+                                           nonlinearity, flip_filters,
+                                           **kwargs)
+
+  def diffusion_kernel(self):
+    return self.W
+
+diff1D = lambda num_filters, f=None, filter_size=(3, ): lambda incoming: Diffusion1DLayer(
+  incoming=incoming,
+  num_filters=num_filters,
+  filter_size=filter_size,
+  nonlinearity=get_conv_nonlinearity(f),
+)
+
+diff1D_1x1 = lambda num_filters, f=None: lambda incoming: Diffusion1DLayer(
+  incoming=incoming,
+  num_filters=num_filters,
+  filter_size=(1, ),
+  nonlinearity=get_conv_nonlinearity(f),
 )

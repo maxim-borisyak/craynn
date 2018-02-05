@@ -15,7 +15,7 @@ with open(osp.join(here, 'README.md'), encoding='utf-8') as f:
 setup(
   name = 'craynn',
 
-  version='0.9.1',
+  version='0.9.9',
 
   description="""Yet another neural network toolkit.""",
 
