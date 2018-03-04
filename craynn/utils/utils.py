@@ -45,12 +45,14 @@ def lmean(xs, cs = None):
   else:
     return joinc(xs, cs)
 
+
 def get_srng(srng):
   if srng is None:
     # from theano.sandbox.cuda.rng_curand import CURAND_RandomStreams as RandomStreams
     return RandomStreams(seed=np.random.randint(2**30))
   else:
     return srng
+
 
 def softmin(xs, alpha=1.0):
   alpha = np.float32(alpha)
@@ -63,8 +65,10 @@ def softmin(xs, alpha=1.0):
   else:
     T.nnet.softmax(-xs * alpha)
 
+
 def log_barrier(v, bounds):
   return -(T.log(v - bounds[0]) + T.log(bounds[1] - v))
+
 
 def make_copy(shared):
   value = shared.get_value(borrow=True)
@@ -73,11 +77,13 @@ def make_copy(shared):
     broadcastable=shared.broadcastable
   )
 
+
 def as_shared(var):
   return theano.shared(
     np.zeros(shape=(0, ) * var.ndim, dtype=var.dtype),
     broadcastable=var.broadcastable
   )
+
 
 def make_uniform(shared, a, b, srng=None):
   srng = get_srng(srng)
@@ -88,6 +94,7 @@ def make_uniform(shared, a, b, srng=None):
     ndim=shared.ndim, dtype=shared.dtype
   )
 
+
 def make_normal(shared, srng):
   srng = get_srng(srng)
 
@@ -95,6 +102,7 @@ def make_normal(shared, srng):
     size=shared.get_value(borrow=True).shape,
     ndim=shared.ndim, dtype=shared.dtype
   )
+
 
 def border_mask(exclude_borders, img_shape, dtype='float32'):
   if img_shape is None:
@@ -114,6 +122,7 @@ def border_mask(exclude_borders, img_shape, dtype='float32'):
 
   return mask
 
+
 def masked(exclude_borders, img_shape, dtype='float32'):
   if exclude_borders > 0:
     M = border_mask(exclude_borders, img_shape, dtype)
@@ -125,6 +134,7 @@ def masked(exclude_borders, img_shape, dtype='float32'):
   else:
     M = None
     return lambda X: X
+
 
 def onehot(y, n_classes=None):
   if n_classes is None:
