@@ -61,7 +61,7 @@ class SImgWatcher(object):
     self.vmax = vmax
 
     def add_image(j, cmap):
-      ax = self.fig.add_subplot(n_rows, n_cols, j)
+      ax = self.fig.add_subplot(n_rows, n_cols, j + 1)
       ax.grid('off')
       im = ax.imshow(
         np.random.uniform(size=img_size),
