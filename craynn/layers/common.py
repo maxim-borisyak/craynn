@@ -5,7 +5,7 @@ import theano.tensor as T
 __all__ = [
   'take', 'minimum', 'maximum', 'concat', 'noise', 'nothing', 'dropout', 'dense', 'select',
   'batch_norm', 'elementwise', 'elementwise_sum', 'elementwise_mean',
-  'flatten', 'feature_pool', 'nonlinearity'
+  'flatten', 'reshape', 'feature_pool', 'nonlinearity'
 ]
 
 get_common_nonlinearity = lambda f=None: nonlinearities.LeakyRectify(0.1) if f is None else f
@@ -42,6 +42,7 @@ elementwise_mean = lambda: lambda incomings: \
   nonlinearity(f=lambda x: x / len(incomings))(layers.ElemwiseMergeLayer(incomings, T.add))
 
 flatten = lambda outdim=2: lambda incoming: layers.FlattenLayer(incoming, outdim=outdim)
+reshape = lambda shape: lambda incoming: layers.ReshapeLayer(incoming, shape)
 
 feature_pool = lambda pool_size=4, axis=1, f=T.max: lambda incoming: \
   layers.FeaturePoolLayer(incoming, pool_size=pool_size, axis=axis, pool_function=f)

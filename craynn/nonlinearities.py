@@ -1,10 +1,5 @@
 import theano.tensor as T
-
-__all__ = [
-  'log_sigmoid',
-  'nlog_sigmoid',
-  'softmax2d'
-]
+from lasagne.nonlinearities import *
 
 def log_sigmoid(x):
   return -T.nnet.softplus(-x)

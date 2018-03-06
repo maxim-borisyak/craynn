@@ -43,6 +43,10 @@ def download_and_save(root, file):
     raise IOError('Path %s already exists!' % path)
 
   import urllib.request
+
+  import warnings
+  warnings.warn('Downloading %s'% (ROOT_URL + file))
+
   response = urllib.request.urlopen(ROOT_URL + file)
   data = response.read()  # a `bytes` object
 

@@ -9,11 +9,11 @@ def _cross_entropy(scores_real, scores_generated, mode=None):
   if mode == 'normal' or mode is None:
     log_f = -T.log(scores_real)
     log_1_f = -T.log(1 - scores_generated)
-  elif mode == 'linear':
+  elif mode == 'linear' or mode == 'logit':
     log_f = T.nnet.softplus(-scores_real)
     log_1_f = T.nnet.softplus(scores_generated)
   else:
-    raise ValueError('Mode should be either normal or linear')
+    raise ValueError('Mode should be either normal, linear or logit')
 
 
   loss_real = T.mean(log_f)

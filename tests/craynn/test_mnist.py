@@ -28,10 +28,3 @@ def test_mnist(tmpdir):
 
   assert y_test.shape[1] == 10
   assert y_train.shape[1] == 10
-
-  import matplotlib.pyplot as plt
-
-  plt.imshow(X_train[:10, 0].reshape(-1, 28), cmap=plt.cm.Greys)
-  plt.title(str(y_train[:10]))
-  plt.colorbar()
-  plt.show()
