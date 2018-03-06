@@ -63,7 +63,8 @@ class TransposedDiff2DLayer(layers.TransposedConv2DLayer):
     crop = 'same'
     super(TransposedDiff2DLayer, self).__init__(incoming, num_filters, filter_size,
                                                 stride, crop, untie_biases, W, b,
-                                                nonlinearity, flip_filters, convolution,
+                                                nonlinearity, flip_filters,
+                                                convolution=convolution,
                                                 **kwargs)
 
   def diffusion_kernel(self):
