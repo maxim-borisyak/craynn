@@ -11,7 +11,7 @@ def get_kernels_by_type(layer, kernel_type):
   kernels = []
 
   for l in layers.get_all_layers(layer):
-    kernel_getter = getattr(layer, kernel_type + '_kernel', None)
+    kernel_getter = getattr(l, kernel_type + '_kernel', None)
     if kernel_getter is not None:
       W = kernel_getter()
       if hasattr(W, '__iter__'):

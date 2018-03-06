@@ -3,11 +3,8 @@ import theano.tensor as T
 
 import numpy as np
 
-from collections import OrderedDict
 from functools import reduce
 from theano.sandbox.rng_mrg import MRG_RandomStreams as RandomStreams
-
-from lasagne.utils import floatX
 
 __all__ = [
   'softmin',
@@ -46,7 +43,7 @@ def lmean(xs, cs = None):
     return joinc(xs, cs)
 
 
-def get_srng(srng):
+def get_srng(srng=None):
   if srng is None:
     # from theano.sandbox.cuda.rng_curand import CURAND_RandomStreams as RandomStreams
     return RandomStreams(seed=np.random.randint(2**30))
