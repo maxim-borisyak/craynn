@@ -59,12 +59,11 @@ class TransposedDiff2DLayer(layers.TransposedConv2DLayer):
                b=init.Constant(0.),
                stride=(1, 1),
                nonlinearity=nonlinearities.LeakyRectify(0.05), flip_filters=True,
-               convolution=T.nnet.conv2d, **kwargs):
+               **kwargs):
     crop = 'same'
     super(TransposedDiff2DLayer, self).__init__(incoming, num_filters, filter_size,
                                                 stride, crop, untie_biases, W, b,
                                                 nonlinearity, flip_filters,
-                                                convolution=convolution,
                                                 **kwargs)
 
   def diffusion_kernel(self):
