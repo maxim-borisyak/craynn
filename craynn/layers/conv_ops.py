@@ -21,10 +21,11 @@ global_pool = lambda f=None: lambda incoming: layers.GlobalPoolLayer(incoming, p
 
 ### 2D ops
 
-conv = lambda num_filters, f=None, filter_size=(3, 3): lambda incoming: layers.Conv2DLayer(
+conv = lambda num_filters, f=None, filter_size=(3, 3), stride=(1, 1): lambda incoming: layers.Conv2DLayer(
   incoming,
   num_filters=num_filters, filter_size=filter_size,
   nonlinearity=get_conv_nonlinearity(f),
+  stride=stride,
   pad='valid'
 )
 
@@ -35,10 +36,11 @@ conv1x1 = lambda num_filters, f=None: lambda incoming: layers.Conv2DLayer(
   pad='valid'
 )
 
-deconv = lambda num_filters, f=None, filter_size=(3, 3): lambda incoming: layers.TransposedConv2DLayer(
+deconv = lambda num_filters, f=None, filter_size=(3, 3), stride=(1, 1): lambda incoming: layers.TransposedConv2DLayer(
   incoming,
   num_filters=num_filters, filter_size=filter_size,
   nonlinearity=get_conv_nonlinearity(f),
+  stride=stride,
   crop='valid'
 )
 
@@ -89,10 +91,11 @@ floating_meanpool = lambda pool_size=(2, 2): lambda incoming: layers.Pool2DLayer
 
 ### 1D ops
 
-conv_1D = lambda num_filters, f=None, filter_size=(3,): lambda incoming: layers.Conv1DLayer(
+conv_1D = lambda num_filters, f=None, filter_size=(3,), stride=(1, ): lambda incoming: layers.Conv1DLayer(
   incoming,
   num_filters=num_filters, filter_size=filter_size,
   nonlinearity=get_conv_nonlinearity(f),
+  stride=stride,
   pad='valid'
 )
 

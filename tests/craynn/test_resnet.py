@@ -28,7 +28,7 @@ class TestResnet(unittest.TestCase):
 
     print(nn.total_number_of_parameters())
 
-    draw_to_file(layers.get_all_layers(nn.outputs), 'test.png')
+    draw_to_file(nn, 'test.png')
 
 
 

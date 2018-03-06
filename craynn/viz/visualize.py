@@ -375,7 +375,7 @@ def make_pydot_graph(layers, output_shape=True, verbose=False):
   return pydot_graph
 
 
-def draw_to_file(layers, filename, **kwargs):
+def draw_to_file(layers_or_net, filename, **kwargs):
   """
   Draws a network diagram to a file
   :parameters:
@@ -385,6 +385,14 @@ def draw_to_file(layers, filename, **kwargs):
           The filename to save output to
       - **kwargs: see docstring of make_pydot_graph for other options
   """
+
+  from ..networks import Net
+
+  if isinstance(layers_or_net, Net):
+    layers = layers_or_net.layers
+  else:
+    layers = layers_or_net
+
   layers = lasagne.layers.get_all_layers(layers)
   dot = make_pydot_graph(layers, **kwargs)
   ext = filename[filename.rfind('.') + 1:]
