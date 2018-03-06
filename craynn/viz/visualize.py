@@ -392,7 +392,7 @@ def draw_to_file(layers, filename, **kwargs):
     fid.write(dot.create(format=ext))
 
 
-def draw_to_notebook(layers, **kwargs):
+def draw_to_notebook(layers_or_net, **kwargs):
   """
   Draws a network diagram in an IPython notebook
   :parameters:
@@ -400,6 +400,14 @@ def draw_to_notebook(layers, **kwargs):
           List of layers or the neural net to draw.
       - **kwargs : see the docstring of make_pydot_graph for other options
   """
+
+  from ..networks import Net
+
+  if isinstance(layers_or_net, Net):
+    layers = layers_or_net.layers
+  else:
+    layers = layers_or_net
+
   from IPython.display import Image
   layers = (layers.get_all_layers() if hasattr(layers, 'get_all_layers')
             else layers)
