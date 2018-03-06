@@ -2,36 +2,23 @@ from lasagne import *
 from ..layers import channel_pool
 
 __all__ = [
-  'adjust_channels',
   'get_kernels_by_type',
   'chain', 'achain', 'repeat'
 ]
 
-def get_kernels_by_type(layer, kernel_type):
+def get_kernels_by_type(layers, kernel_type):
   kernels = []
 
-  for l in layers.get_all_layers(layer):
+  for l in layers:
     kernel_getter = getattr(l, kernel_type + '_kernel', None)
     if kernel_getter is not None:
       W = kernel_getter()
-      if hasattr(W, '__iter__'):
+      if isinstance(W, (list, tuple)):
         kernels.extend(W)
       else:
         kernels.append(W)
 
   return kernels
-
-def adjust_channels(incoming, target_channels, redist=channel_pool):
-  input_channels = layers.get_output_shape(incoming)[1]
-
-  if input_channels != target_channels:
-    return redist(
-      incoming=incoming,
-      num_filters=target_channels,
-      name='channel redistribution'
-    )
-  else:
-    return incoming
 
 def _chain(incoming, definition):
   net = incoming

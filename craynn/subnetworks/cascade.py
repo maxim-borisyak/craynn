@@ -1,7 +1,7 @@
 from lasagne import *
 
 from .. import layers as clayers
-from .common import get_kernels_by_type
+from .meta import get_kernels_by_type
 
 __all__ = [
   'cascade_op',

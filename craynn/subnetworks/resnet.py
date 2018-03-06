@@ -1,6 +1,6 @@
 from ..layers import *
 from .conv_nets import double_diff
-from .common import achain
+from .meta import achain
 
 __all__ = [
   'residual_connection',

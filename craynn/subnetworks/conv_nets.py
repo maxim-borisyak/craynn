@@ -3,7 +3,7 @@ import theano.tensor as T
 from ..layers import *
 from ..layers.conv_ops import get_companion_nonlinearity
 
-from .common import repeat
+from .meta import repeat
 
 __all__ = [
   'conv_block', 'double_conv',

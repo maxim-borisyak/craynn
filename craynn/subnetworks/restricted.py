@@ -1,6 +1,6 @@
 import theano
 import theano.tensor as T
-from .common import get_kernels_by_type
+from .meta import get_kernels_by_type
 from ..utils import lsum
 
 __all__ = [
