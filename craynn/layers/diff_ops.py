@@ -4,7 +4,7 @@ import theano.tensor as T
 __all__ = [
   'Diffusion2DLayer',
   'ChannelPooling2DLayer',
-  'diff', 'diff1x1',
+  'diff', 'diff1x1', 'dediff',
   'channel_pool', 'channel_factor_pool',
   'diff1D', 'diff1D_1x1'
 ]
