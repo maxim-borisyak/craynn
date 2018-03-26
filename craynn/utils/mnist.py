@@ -106,6 +106,6 @@ def mnist(root='./mnist', one_hot=False, cast=None):
     X_train = X_train.astype(cast)
     X_test = X_test.astype(cast)
     y_train = y_train.astype(cast)
-    y_test = y_train.astype(cast)
+    y_test = y_test.astype(cast)
 
   return X_train, y_train, X_test, y_test

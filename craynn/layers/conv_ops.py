@@ -1,5 +1,7 @@
 from lasagne import *
 
+import theano.tensor as T
+
 __all__ = [
   'conv', 'conv1x1',
   'deconv', 'deconv1x1',
@@ -17,7 +19,9 @@ get_conv_nonlinearity = lambda f=None: nonlinearities.LeakyRectify(0.05) if f is
 get_companion_nonlinearity = lambda num_units=None, f=None: \
   nonlinearities.sigmoid if num_units is None or num_units == 1 else nonlinearities.softmax
 
-global_pool = lambda f=None: lambda incoming: layers.GlobalPoolLayer(incoming, pool_function=f)
+get_pool_function = lambda f=None: T.max if f is None else f
+
+global_pool = lambda f: lambda incoming: layers.GlobalPoolLayer(incoming, pool_function=f)
 
 ### 2D ops
 

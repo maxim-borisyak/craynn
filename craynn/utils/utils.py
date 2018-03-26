@@ -19,7 +19,8 @@ __all__ = [
   'make_uniform',
   'make_normal',
   'get_srng',
-  'border_mask'
+  'border_mask',
+  'zeros'
 ]
 
 join = lambda xs: reduce(lambda a, b: a + b, xs)
@@ -63,16 +64,53 @@ def softmin(xs, alpha=1.0):
     T.nnet.softmax(-xs * alpha)
 
 
-def log_barrier(v, bounds):
-  return -(T.log(v - bounds[0]) + T.log(bounds[1] - v))
+def log_barrier(v, lower_bound=None, upper_bound=None):
+  if lower_bound is None and upper_bound is None:
+    return T.constant(0, dtype='floatX')
 
+  if lower_bound is not None:
+    barrier = -T.log(v - lower_bound)
 
-def make_copy(shared):
-  value = shared.get_value(borrow=True)
-  return theano.shared(
-    np.zeros(value.shape, dtype=value.dtype),
-    broadcastable=shared.broadcastable
-  )
+    if upper_bound is not None:
+      barrier = barrier - T.log(upper_bound - v)
+  else:
+    barrier = -T.log(upper_bound - v)
+
+  if v.ndim > 0:
+    return T.sum(barrier)
+  else:
+    return barrier
+
+def exp_barrier(v):
+  return T.exp(v)
+
+def zeros(shared):
+  values = shared.get_value(borrow=True)
+  v = T.zeros(values.shape, values.dtype)
+  return T.patternbroadcast(v, shared.broadcastable)
+
+def make_copy(shared, value=None):
+  """
+    Returns shared variable with the same shape, dtype and broadcastable
+    parameters as `shared`.
+  :param shared: value to copy from
+  :param value: if `value` if `None` copies content of `shared`,
+    otherwise fills it with specified value.
+  :return: a new shared variable.
+  """
+
+  if value is not None:
+    content = shared.get_value(borrow=True)
+    return theano.shared(
+      np.ones(content.shape, dtype=content.dtype) * value,
+      broadcastable=shared.broadcastable
+    )
+  else:
+    content = shared.get_value()
+    return theano.shared(
+      content,
+      broadcastable=shared.broadcastable
+    )
 
 
 def as_shared(var):

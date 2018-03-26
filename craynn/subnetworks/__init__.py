@@ -5,7 +5,8 @@ General rules held in this module:
     layer/subnetwork with the same name. Such parameters allow to override layer/subnetwork used.
     For example, overriding default nonlinearity: conv=lambda num_filters: conv(num_filters, f=T.nnet.sigmoid).
 - usually, module provides two similar implementations of the same subnetwork like
-  fire and fire_block. Longer name = more flexibility but more parameters.
+  fire and fire_block. Subnetworks with shorter name are usually shortcuts to the method with longer name
+  with popular default parameters.
 """
 
 from .conv_nets import *

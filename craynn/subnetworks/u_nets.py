@@ -6,7 +6,7 @@ __all__ = [
   'unet'
 ]
 
-def _unet(incoming, down_ops, up_ops, concat=concat()):
+def _unet(incoming, down_ops, up_ops, middle_ops=list(), concat=concat()):
   down_chain = []
 
   net = incoming
@@ -15,13 +15,13 @@ def _unet(incoming, down_ops, up_ops, concat=concat()):
     net = op(net)
     down_chain.append(net)
 
-  op = up_ops[0]
-  net = op(net)
+  for op in middle_ops:
+    net = op(net)
 
-  for down_layer, op in zip(down_chain[:-1][::-1], up_ops[1:]):
+  for down_layer, op in zip(down_chain[::-1], up_ops):
     net = op(concat([net, down_layer]))
 
   return net
 
-unet = lambda down_ops, up_ops, concat=concat(): lambda incoming: \
-  _unet(incoming, down_ops, up_ops, concat)
+unet = lambda down_ops, up_ops, middle_ops=list(), concat=concat(): lambda incoming: \
+  _unet(incoming, down_ops, up_ops, middle_ops, concat)

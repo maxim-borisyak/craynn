@@ -40,15 +40,199 @@ import numpy as np
 import theano
 import theano.tensor as T
 
-from lasagne import *
 from lasagne.updates import get_or_compute_grads
+from lasagne.updates import utils as lasagne_utils
+
+from ..utils import zeros
 
 from collections import OrderedDict
 
 __all__ = [
+  'rmsprop',
   'adam',
-  'adamax'
+  'adamax',
+  'amsgrad',
+  'dummy_reset'
 ]
+
+dummy_reset = lambda algo: lambda *args, scale_factor=None, **kwargs: (algo(*args, **kwargs), OrderedDict())
+
+def momentum(loss_or_grads, params, learning_rate=1.0e-3, rho=0.9, scale_factor=None):
+  grads = get_or_compute_grads(loss_or_grads, params)
+
+  updates = OrderedDict()
+  resets = OrderedDict()
+
+  # Using theano constant to prevent upcasting of float32
+  one = T.constant(1)
+
+  for param, grad in zip(params, grads):
+    value = param.get_value(borrow=True)
+    velocity = theano.shared(np.zeros(value.shape, dtype=value.dtype),
+                             broadcastable=param.broadcastable)
+
+    updates[velocity] = rho * velocity + (one - rho) * grad
+    updates[param] = param - learning_rate * velocity
+
+    if scale_factor is None:
+      resets[velocity] = zeros(velocity)
+    else:
+      resets[velocity] = velocity / scale_factor
+
+  return updates, resets
+
+
+def rmsprop(loss_or_grads, params, learning_rate=1.0e-3, rho=0.9, epsilon=1e-6, scale_factor=None):
+  """RMSProp updates
+
+  Scale learning rates by dividing with the moving average of the root mean
+  squared (RMS) gradients. See [1]_ for further description.
+
+  Parameters
+  ----------
+  loss_or_grads : symbolic expression or list of expressions
+      A scalar loss expression, or a list of gradient expressions
+  params : list of shared variables
+      The variables to generate update expressions for
+  learning_rate : float or symbolic scalar
+      The learning rate controlling the size of update steps
+  rho : float or symbolic scalar
+      Gradient moving average decay factor
+  epsilon : float or symbolic scalar
+      Small value added for numerical stability
+
+  Returns
+  -------
+  OrderedDict
+      A dictionary mapping each parameter to its update expression
+
+  Notes
+  -----
+  `rho` should be between 0 and 1. A value of `rho` close to 1 will decay the
+  moving average slowly and a value close to 0 will decay the moving average
+  fast.
+
+  Using the step size :math:`\\eta` and a decay factor :math:`\\rho` the
+  learning rate :math:`\\eta_t` is calculated as:
+
+  .. math::
+     r_t &= \\rho r_{t-1} + (1-\\rho)*g^2\\\\
+     \\eta_t &= \\frac{\\eta}{\\sqrt{r_t + \\epsilon}}
+
+  References
+  ----------
+  .. [1] Tieleman, T. and Hinton, G. (2012):
+         Neural Networks for Machine Learning, Lecture 6.5 - rmsprop.
+         Coursera. http://www.youtube.com/watch?v=O3sxAc4hxZU (formula @5:20)
+  """
+  grads = get_or_compute_grads(loss_or_grads, params)
+  updates = OrderedDict()
+  resets = OrderedDict()
+
+  # Using theano constant to prevent upcasting of float32
+  one = T.constant(1)
+
+  for param, grad in zip(params, grads):
+    value = param.get_value(borrow=True)
+    accu = theano.shared(np.zeros(value.shape, dtype=value.dtype),
+                         broadcastable=param.broadcastable)
+    accu_new = rho * accu + (one - rho) * grad ** 2
+    updates[accu] = accu_new
+
+    resets[accu] = (
+      accu * scale_factor
+      if scale_factor is not None else
+      zeros(accu)
+    )
+
+    updates[param] = param - (learning_rate * grad /
+                              T.sqrt(accu_new + epsilon))
+
+  return updates, resets
+
+def amsgrad(loss_or_grads, params, learning_rate=0.001, beta1=0.9,
+            beta2=0.999, epsilon=1e-8, scale_factor=None):
+  """AMSGrad updates
+
+  AMSGrad updates implemented as in [1]_.
+
+  Parameters
+  ----------
+  loss_or_grads : symbolic expression or list of expressions
+      A scalar loss expression, or a list of gradient expressions
+  params : list of shared variables
+      The variables to generate update expressions for
+  learning_rate : float or symbolic scalar
+      Learning rate
+  beta1 : float or symbolic scalar
+      Exponential decay rate for the first moment estimates.
+  beta2 : float or symbolic scalar
+      Exponential decay rate for the second moment estimates.
+  epsilon : float or symbolic scalar
+      Constant for numerical stability.
+
+  Returns
+  -------
+  OrderedDict
+      A dictionary mapping each parameter to its update expression
+
+  References
+  ----------
+  .. [1] https://openreview.net/forum?id=ryQu7f-RZ
+  """
+  all_grads = get_or_compute_grads(loss_or_grads, params)
+  t_prev = theano.shared(lasagne_utils.floatX(0.))
+  updates = OrderedDict()
+  resets = OrderedDict()
+
+  # Using theano constant to prevent upcasting of float32
+  one = T.constant(1)
+
+  t = t_prev + 1
+  a_t = learning_rate * T.sqrt(one - beta2 ** t) / (one - beta1 ** t)
+
+  for param, g_t in zip(params, all_grads):
+    value = param.get_value(borrow=True)
+    m_prev = theano.shared(np.zeros(value.shape, dtype=value.dtype),
+                           broadcastable=param.broadcastable)
+    v_prev = theano.shared(np.zeros(value.shape, dtype=value.dtype),
+                           broadcastable=param.broadcastable)
+    v_hat_prev = theano.shared(np.zeros(value.shape, dtype=value.dtype),
+                               broadcastable=param.broadcastable)
+
+    m_t = beta1 * m_prev + (one - beta1) * g_t
+    v_t = beta2 * v_prev + (one - beta2) * g_t ** 2
+    v_hat_t = T.maximum(v_hat_prev, v_t)
+    step = a_t * m_t / (T.sqrt(v_hat_t) + epsilon)
+
+    updates[m_prev] = m_t
+    updates[v_prev] = v_t
+    updates[v_hat_prev] = v_hat_t
+
+    resets[m_prev] = (
+      m_prev / scale_factor
+      if scale_factor is not None else
+      zeros(m_prev)
+    )
+    resets[v_prev] = (
+      v_prev / scale_factor
+      if scale_factor is not None else
+      zeros(v_prev)
+    )
+    resets[v_hat_prev] = (
+      v_hat_prev / scale_factor
+      if scale_factor is not None else
+      zeros(v_hat_prev)
+    )
+
+    updates[param] = param - step
+
+  updates[t_prev] = t
+
+  if scale_factor is None:
+    resets[t_prev] = 0.0
+
+  return updates, resets
 
 def adam(loss_or_grads, params, learning_rate=0.001, beta1=0.9,
          beta2=0.999, epsilon=1e-8, scale_factor=None):
@@ -87,7 +271,7 @@ def adam(loss_or_grads, params, learning_rate=0.001, beta1=0.9,
          arXiv preprint arXiv:1412.6980.
   """
   all_grads = get_or_compute_grads(loss_or_grads, params)
-  t_prev = theano.shared(utils.floatX(0.))
+  t_prev = theano.shared(lasagne_utils.floatX(0.))
   updates = OrderedDict()
   resets = OrderedDict()
 
@@ -107,13 +291,13 @@ def adam(loss_or_grads, params, learning_rate=0.001, beta1=0.9,
     resets[m_prev] = (
       m_prev / scale_factor
       if scale_factor is not None else
-      T.zeros(value.shape, value.dtype)
+      zeros(m_prev)
     )
 
     resets[v_prev] = (
       v_prev * scale_factor
       if scale_factor is not None else
-      T.zeros(value.shape, value.dtype)
+      zeros(v_prev)
     )
 
     if scale_factor is None:
@@ -173,11 +357,12 @@ def adamax(loss_or_grads, params, learning_rate=0.002, beta1=0.9,
          arXiv preprint arXiv:1412.6980.
   """
   all_grads = get_or_compute_grads(loss_or_grads, params)
-  t_prev = theano.shared(utils.floatX(0.))
+  t_prev = theano.shared(lasagne_utils.floatX(0.))
   updates = OrderedDict()
   resets = OrderedDict()
 
-  scale_factor = utils.floatX(scale_factor)
+  if scale_factor is not None:
+    scale_factor = lasagne_utils.floatX(scale_factor)
 
   # Using theano constant to prevent upcasting of float32
   one = T.constant(1)
@@ -213,7 +398,7 @@ def adamax(loss_or_grads, params, learning_rate=0.002, beta1=0.9,
     )
 
     if scale_factor is None:
-      resets[t_prev] = 0.0
+      resets[t_prev] = 1.0
 
   updates[t_prev] = t
 
