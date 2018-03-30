@@ -1,6 +1,3 @@
-from lasagne import *
-import theano.tensor as T
-
 import numpy as np
 
 __all__ = [
