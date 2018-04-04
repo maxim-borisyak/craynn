@@ -20,7 +20,8 @@ __all__ = [
   'make_normal',
   'get_srng',
   'border_mask',
-  'zeros'
+  'zeros',
+  'lsoftmax'
 ]
 
 join = lambda xs: reduce(lambda a, b: a + b, xs)
@@ -51,15 +52,20 @@ def get_srng(srng=None):
   else:
     return srng
 
+def lsoftmax(xs):
+  exp_xs = [T.exp(x) for x in xs]
+  n = lsum(exp_xs)
+
+  return [ex / n for ex in exp_xs]
 
 def softmin(xs, alpha=1.0):
   alpha = np.float32(alpha)
 
   if hasattr(xs, '__len__'):
-    exp_xs = [ T.exp(-x * alpha) for x in xs ]
-    n = join(exp_xs)
+    exp_xs = [T.exp(-x) for x in xs]
+    n = lsum(exp_xs)
 
-    return [ ex / n for ex in exp_xs ]
+    return [ex / n for ex in exp_xs]
   else:
     T.nnet.softmax(-xs * alpha)
 

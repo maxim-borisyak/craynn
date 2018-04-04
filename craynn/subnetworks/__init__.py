@@ -19,3 +19,4 @@ from .u_nets import *
 from .column_nets import *
 from .energy_based import *
 from .maxout_nets import *
+from .deeply_supervised_nets import *
