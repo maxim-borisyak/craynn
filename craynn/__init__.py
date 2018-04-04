@@ -8,3 +8,5 @@ Important note: this package is poorly designed, unstable and lacks documentatio
 """
 
 from . import layers
+from . import init
+from . import nonlinearities

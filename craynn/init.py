@@ -1,41 +1,14 @@
 import numpy as np
 
-from lasagne.init import Initializer
-from lasagne.utils import floatX
+import tensorflow as tf
 
 __all__ = [
-  'Diffusion'
+  'normal',
+  'zeros'
 ]
 
-class SumOfInitializers(Initializer):
-  def __init__(self, this, that=None):
-    self.this = this
-    self.that = that
+normal = lambda mean=0.0, std=1.0e-3, dtype='float32': lambda shape: \
+  np.random.normal(loc=mean, scale=std, size=shape).astype(dtype)
 
-  def sample(self, shape):
-    return self.this.sample(shape) + self.that.sample(shape)
-
-class InitializerWithSum(object):
-  def __add__(self, other):
-    return SumOfInitializers(self, other)
-
-class Diffusion(Initializer, InitializerWithSum):
-  def __init__(self, gain=1.0, offset=0):
-    self.gain = gain
-    self.offset = offset
-
-  def sample(self, shape):
-    assert len(shape) == 4, 'Diffusion init is only for convolutional layers'
-
-    id_conv = np.zeros(shape=shape[2:])
-    cx, cy = shape[2] // 2, shape[3] // 2
-    id_conv[cx, cy] = 1.0 / shape[0] * shape[1]
-
-    s = np.zeros(shape=shape)
-    num_filters = shape[0]
-    n_channels = shape[1]
-
-    for i in range(num_filters):
-      s[i, ((i + self.offset) % n_channels)] = id_conv
-
-    return floatX(s * self.gain)
+zeros = lambda dtype='float32': lambda shape: \
+  np.zeros(shape=shape, dtype=dtype)

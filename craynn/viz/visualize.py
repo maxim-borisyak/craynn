@@ -23,150 +23,156 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-import io
-import lasagne
+from ..layers import Layer, DenseLayer, InputLayer, get_output_shape, get_layers
+from ..layers.inspect import get_number_of_params, get_total_number_of_params
 
-def get_hex_color(layer_class):
-  COLORS = [
-    ### blue
-    ('#a6cee3', '#1f78b4'),
-    ### green
-    ('#b2df8a', '#33a02c'),
-    ### red
-    ('#fb9a99', '#e31a1c'),
-    ### orange
-    ('#fdbf6f', '#ff7f00'),
-    ### magenta
-    ('#cab2d6', '#6a3d9a'),
-    ### yellow/brown
-    ('#ffff99', '#b15928'),
+__all__ = [
+  'draw_to_file',
+  'draw_to_notebook',
+  'viz_all_params',
+  'viz_params'
+]
+
+def full_class_name(clazz):
+  return clazz.__module__ + '.' + clazz.__name__
+
+def remove_craynn_layers_prefix(names):
+  reduced_names = [
+    ('.'.join(name.split('.')[3:]) if name.startswith('craynn.layers.') else name)
+    for name in names
   ]
+  if len(set(reduced_names)) < len(set(names)):
+    return names
+  else:
+    return reduced_names
 
+_color_set = [
+  ### blue
+  ('#a6cee3', '#1f78b4'),
+  ### green
+  ('#b2df8a', '#33a02c'),
+  ### red
+  ('#fb9a99', '#e31a1c'),
+  ### orange
+  ('#fdbf6f', '#ff7f00'),
+  ### magenta
+  ('#cab2d6', '#6a3d9a'),
+  ### yellow/brown
+  ('#ffff99', '#b15928'),
+]
+
+def _stable_hash(data):
+  from hashlib import blake2b
+  return int.from_bytes(blake2b(data.encode('utf-16be'), digest_size=8).digest(), byteorder='big')
+
+def get_color(layer_class):
   layer_type = layer_class.__name__.lower()
 
-  hashed = int(hash(layer_type)) % len(COLORS[0])
+  hashed = _stable_hash(layer_class.__name__) % len(_color_set[0])
 
-  if 'conv' in layer_type or issubclass(layer_class, lasagne.layers.conv.BaseConvLayer):
-    return COLORS[0][hashed]
+  if 'conv' in layer_type:
+    return _color_set[0][hashed]
 
-  if 'dense' in layer_type or issubclass(layer_class, lasagne.layers.DenseLayer):
-    return COLORS[1][hashed]
+  if issubclass(layer_class, DenseLayer) or 'dense' in layer_type:
+    return _color_set[1][hashed]
 
-  if 'input' is layer_type or issubclass(layer_class, lasagne.layers.InputLayer):
-    return COLORS[2][hashed]
+  if issubclass(layer_class, InputLayer) or 'input' is layer_type:
+    return _color_set[2][hashed]
 
-  if 'pool' in layer_type or layer_class.__name__ in lasagne.layers.pool.__all__:
-    return COLORS[3][hashed]
+  if 'pool' in layer_type:
+    return _color_set[3][hashed]
 
-  if layer_class.__name__ in lasagne.layers.recurrent.__all__:
-    return COLORS[4][hashed]
+  if 'recurrent' in layer_type:
+    return _color_set[4][hashed]
 
-  return COLORS[5][hashed]
+  return _color_set[5][hashed]
 
-
-def make_pydot_graph(layers, output_shape=True, verbose=False):
-  """
-  :parameters:
-      - layers : list
-          List of the layers, as obtained from lasagne.layers.get_all_layers
-      - output_shape: (default `True`)
-          If `True`, the output shape of each layer will be displayed.
-      - verbose: (default `False`)
-          If `True`, layer attributes like filter shape, stride, etc.
-          will be displayed.
-  :returns:
-      - pydot_graph : PyDot object containing the graph
-  """
-  import pydotplus as pydot
-  pydot_graph = pydot.Dot('Network', graph_type='digraph')
-  pydot_nodes = {}
-  pydot_edges = []
-  for i, layer in enumerate(layers):
-    if hasattr(layer, 'name') and getattr(layer, 'name') is not None:
-      layer_type = '{0}\n{1}'.format(getattr(layer, 'name'), layer.__class__.__name__)
+def viz_params(**kwargs):
+  def f(layer):
+    param_info = get_number_of_params(layer, **kwargs).items()
+    if len(param_info) > 0:
+      return ','.join([ '%s: %d' % (k.name, v) for k, v in param_info ])
     else:
-      layer_type = '{0}'.format(layer.__class__.__name__)
+      return None
 
-    key = repr(layer)
-    label = layer_type
-    color = get_hex_color(layer.__class__)
-    if verbose:
-      for attr in ['num_filters', 'num_units', 'ds',
-                   'filter_shape', 'stride', 'strides', 'p']:
-        if hasattr(layer, attr):
-          label += '\n{0}: {1}'.format(attr, getattr(layer, attr))
-      if hasattr(layer, 'nonlinearity'):
-        try:
-          nonlinearity = layer.nonlinearity.__name__
-        except AttributeError:
-          nonlinearity = layer.nonlinearity.__class__.__name__
-        label += '\nnonlinearity: {0}'.format(nonlinearity)
-
-    if output_shape:
-      label += '\nOutput shape: {0}'.format(layer.output_shape)
-
-    pydot_nodes[key] = pydot.Node(
-      key, label=label, shape='record', fillcolor=color, style='filled')
-
-    if hasattr(layer, 'input_layers'):
-      for input_layer in layer.input_layers:
-        pydot_edges.append([repr(input_layer), key])
-
-    if hasattr(layer, 'input_layer'):
-      pydot_edges.append([repr(layer.input_layer), key])
-
-  for node in pydot_nodes.values():
-    pydot_graph.add_node(node)
-
-  for edges in pydot_edges:
-    pydot_graph.add_edge(
-      pydot.Edge(pydot_nodes[edges[0]], pydot_nodes[edges[1]]))
-  return pydot_graph
+viz_all_params = lambda **kwargs: lambda layer: '%d' % get_total_number_of_params(layer, **kwargs)
 
 
-def draw_to_file(layers_or_net, filename, **kwargs):
-  """
-  Draws a network diagram to a file
-  :parameters:
-      - layers : list or NeuralNet instance
-          List of layers or the neural net to draw.
-      - filename : string
-          The filename to save output to
-      - **kwargs: see docstring of make_pydot_graph for other options
-  """
+def make_graph(layers, output_shape=('output shape', get_output_shape), **properties_to_display):
+  import pydotplus as pydot
 
-  from ..networks import Net
+  additional_properties = list()
 
-  if isinstance(layers_or_net, Net):
-    layers = layers_or_net.layers
-  else:
-    layers = layers_or_net
+  for k in properties_to_display:
+    property_spec = properties_to_display[k]
 
-  layers = lasagne.layers.get_all_layers(layers)
-  dot = make_pydot_graph(layers, **kwargs)
-  ext = filename[filename.rfind('.') + 1:]
-  with io.open(filename, 'wb') as fid:
-    fid.write(dot.create(format=ext))
+    if callable(property_spec):
+      additional_properties.append((k, property_spec))
+    elif property_spec is None:
+      pass
+    else:
+      assert len(property_spec) == 2
+      additional_properties.append(property_spec)
+
+  additional_properties.append(output_shape)
+
+  graph = pydot.Dot('network', graph_type='digraph')
+
+  layer_indx = dict([
+    (layer, 'node%d' % i) for i, layer in enumerate(layers)
+  ])
+
+  nodes = dict()
 
 
-def draw_to_notebook(layers_or_net, **kwargs):
-  """
-  Draws a network diagram in an IPython notebook
-  :parameters:
-      - layers : list or NeuralNet instance
-          List of layers or the neural net to draw.
-      - **kwargs : see the docstring of make_pydot_graph for other options
-  """
+  layers_classes = remove_craynn_layers_prefix([
+    layer.__class__.__name__ for layer in layers
+  ])
 
-  from ..networks import Net
+  for layer, layer_class in zip(layers, layers_classes):
+    if layer.name is None:
+      info = [layer_class]
+    else:
+      info = [layer.name, layer_class]
 
-  if isinstance(layers_or_net, Net):
-    layers = layers_or_net.layers
-  else:
-    layers = layers_or_net
+    for prop_name, prop in additional_properties:
+      try:
+        if prop_name is not None:
+          info.append('%s: %s' % (prop_name, prop(layer)))
+        else:
+          info.append('%s' % prop(layer))
+      except Exception as e:
+        import warnings
+        warnings.warn('Failed to evaluate property %s [%s]' % (prop_name, e))
 
+    nodes[layer] = pydot.Node(
+      name=layer_indx[layer], shape='record',
+      label='\n'.join(info),
+      fillcolor=get_color(layer.__class__), style='filled'
+    )
+
+  for node in nodes.values():
+    graph.add_node(node)
+
+  for layer in layers:
+    for incoming in getattr(layer, 'incomings', list()):
+      graph.add_edge(pydot.Edge(nodes[incoming], nodes[layer]))
+
+  return graph
+
+
+def draw_to_file(layers_or_layer, path, **properties_to_display):
+  graph = make_graph(get_layers(layers_or_layer), **properties_to_display)
+
+  with open(path, 'wb') as f:
+    f.write(
+      graph.create(format='png')
+    )
+
+
+def draw_to_notebook(layers_or_layer, **properties_to_display):
   from IPython.display import Image
-  layers = (layers.get_all_layers() if hasattr(layers, 'get_all_layers')
-            else layers)
-  dot = make_pydot_graph(layers, **kwargs)
-  return Image(dot.create_png())
+
+  graph = make_graph(get_layers(layers_or_layer), **properties_to_display)
+
+  return Image(graph.create(format='png'))

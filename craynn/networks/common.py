@@ -1,8 +1,5 @@
 import numpy as np
 
-from lasagne import layers
-from lasagne import regularization
-
 from ..subnetworks import achain
 from ..subnetworks import get_kernels_by_type
 

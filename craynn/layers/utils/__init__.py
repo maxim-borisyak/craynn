@@ -1,1 +1,1 @@
-from .inspect import *
+from .inspect_function import *
