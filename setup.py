@@ -56,8 +56,7 @@ setup(
     'numpy',
     'scipy',
     'matplotlib',
-    'theano',
-    'lasagne',
+    'tensorflow',
     'pydotplus',
   ],
 

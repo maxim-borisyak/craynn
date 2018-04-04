@@ -7,11 +7,6 @@ it focuses on macro-architecture.
 Important note: this package is poorly designed, unstable and lacks documentation.
 """
 
-from . import init
 from . import layers
-from . import networks
+from . import init
 from . import nonlinearities
-from . import subnetworks
-from . import updates
-from . import utils
-from . import viz
