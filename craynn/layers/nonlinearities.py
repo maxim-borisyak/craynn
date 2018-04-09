@@ -5,7 +5,7 @@ __all__ = [
   'relu',
   'leaky_relu',
   'softplus',
-  'softmax',
+  'softmax', 'logsoftmax',
   'elu',
   'linear'
 ]
@@ -18,6 +18,9 @@ leaky_relu = lambda leakiness=0.05, name='LeakyReLU': \
 
 softplus = lambda name='softplus': lambda x: tf.nn.softplus(x)
 softmax = lambda name='softmax': lambda x: tf.nn.softmax(x, name=name)
+
+logsoftmax = lambda name='logsoftmax': lambda x: tf.nn.log_softmax
+
 elu = lambda name='ELU': lambda x: tf.nn.elu(x, name=name)
 
 linear = lambda name='linear': lambda x: x

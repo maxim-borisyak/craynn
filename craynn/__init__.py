@@ -7,6 +7,7 @@ it focuses on macro-architecture.
 Important note: this package is poorly designed, unstable and lacks documentation.
 """
 
+import os as _os
+_os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
 from . import layers
-from . import init
-from . import nonlinearities

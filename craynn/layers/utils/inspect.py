@@ -1,4 +1,4 @@
-from .meta import *
+from craynn.layers.layers_meta import *
 
 import numpy as np
 from collections import OrderedDict

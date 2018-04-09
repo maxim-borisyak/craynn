@@ -1,8 +1,8 @@
 import tensorflow as tf
 
-from .meta import FunctionalLayer, get_output_shape
-from .common import get_common_nonlinearity
-from ..init import normal, zeros
+from .layers_meta import FunctionalLayer, get_output_shape
+from .common_ops import get_nonlinearity, default_common_nonlinearity
+from .init import normal, zeros
 
 __all__ = [
   'DenseLayer',
@@ -10,7 +10,8 @@ __all__ = [
 ]
 
 class DenseLayer(FunctionalLayer):
-  def __init__(self, incoming, num_units, activation='default',
+  def __init__(self, incoming, num_units,
+               nonlinearity=default_common_nonlinearity,
                W=normal(0.0, 1.0e-3),
                b=zeros(),
                name=None):
@@ -33,13 +34,13 @@ class DenseLayer(FunctionalLayer):
       expected_shape=(num_units, )
     )
 
-    self.params[self.W] = ['weights', 'trainable']
-    self.params[self.b] = ['biases', 'trainable']
+    self.params['W'] = (self.W, ['weights', 'trainable', 'free'])
+    self.params['b'] = (self.b, ['biases', 'trainable', 'free'])
 
-    self.activation = get_common_nonlinearity(activation)
+    self.nonlinearity = get_nonlinearity(nonlinearity)
 
   def get_output_for(self, X):
-    return self.activation(
+    return self.nonlinearity(
       tf.matmul(X, self.W) + self.b[None, :]
     )
 
@@ -49,5 +50,5 @@ class DenseLayer(FunctionalLayer):
 
     return (input_shape[0], self.num_units)
 
-dense = lambda incoming: lambda num_units, f='default', name=None: \
-  DenseLayer(incoming, num_units, activation=f, name=name)
+dense = lambda num_units, f='default', name=None: lambda incoming: \
+  DenseLayer(incoming, num_units, nonlinearity=f, name=name)

@@ -23,8 +23,8 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from ..layers import Layer, DenseLayer, InputLayer, get_output_shape, get_layers
-from ..layers.inspect import get_number_of_params, get_total_number_of_params
+from ..layers import DenseLayer, InputLayer, get_output_shape, get_layers
+from craynn.layers.utils.inspect import get_number_of_params, get_total_number_of_params
 
 __all__ = [
   'draw_to_file',
@@ -95,6 +95,8 @@ def viz_params(**kwargs):
     else:
       return None
 
+  return f
+
 viz_all_params = lambda **kwargs: lambda layer: '%d' % get_total_number_of_params(layer, **kwargs)
 
 
@@ -141,9 +143,8 @@ def make_graph(layers, output_shape=('output shape', get_output_shape), **proper
           info.append('%s: %s' % (prop_name, prop(layer)))
         else:
           info.append('%s' % prop(layer))
-      except Exception as e:
-        import warnings
-        warnings.warn('Failed to evaluate property %s [%s]' % (prop_name, e))
+      except Exception:
+        pass
 
     nodes[layer] = pydot.Node(
       name=layer_indx[layer], shape='record',

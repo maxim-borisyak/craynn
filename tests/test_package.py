@@ -3,8 +3,6 @@ import importlib.util as imp
 import os
 import os.path as osp
 
-import sys
-
 def get_submodules(module):
   pathes = [
     item
@@ -63,7 +61,12 @@ def uniqness(module):
 
 def test_name_uniqness():
   import craynn
-  submodules = get_exported(craynn)
+  submodules = [
+    getattr(craynn, item)
+    for item in [
+      'layers'
+    ]
+  ]
 
   for submodule in submodules:
     uniqness(submodule)

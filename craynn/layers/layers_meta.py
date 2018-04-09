@@ -137,7 +137,7 @@ def reduce_graph(operator, strict=False):
     that computes the operator output for `layers`.
   """
   def getter(layers_or_layer, substitutes=None, **kwargs):
-    from .utils import apply_with_kwrags
+    from ..meta import apply_with_kwrags
 
     if isinstance(layers_or_layer, Layer):
       layers = [layers_or_layer]
@@ -167,13 +167,13 @@ get_layers = lambda layers_or_layer: map_graph(lambda layer: layer, layers_or_la
 
 def get_params(layer: FunctionalLayer, **properties):
   if not hasattr(layer, 'params'):
-    return []
+    return list()
 
   return [
     param
-    for param in layer.params.keys()
+    for (param_name, (param, spec)) in layer.params.items()
     if all([
-      (v == (k in layer.params[param]) or v is None)
+      (v == (k in spec) or v is None)
       for k, v in properties.items()
     ])
   ]
@@ -181,6 +181,5 @@ def get_params(layer: FunctionalLayer, **properties):
 def get_all_params(layer_or_layers, **properties):
   collected_params = map_graph(lambda layer: get_params(layer, **properties), layer_or_layers)
   return [ param for params in collected_params for param in params ]
-
 
 

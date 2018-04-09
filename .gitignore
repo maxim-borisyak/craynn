@@ -106,3 +106,4 @@ ENV/
 /tests/craynn/mnist/
 
 *.png
+*.ipynb
